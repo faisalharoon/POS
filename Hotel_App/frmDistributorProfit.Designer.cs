@@ -1,0 +1,180 @@
+﻿namespace General_App
+{
+    partial class frmDistributorProfit
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.btnshow = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.dtmend = new System.Windows.Forms.MonthCalendar();
+            this.dtmstart = new System.Windows.Forms.MonthCalendar();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.reportViewer1 = new Microsoft.Reporting.WinForms.ReportViewer();
+            this.ddlcustomer = new System.Windows.Forms.ComboBox();
+            this.btnOpenCustomerDialog = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.panel1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.btnshow);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.dtmend);
+            this.panel1.Controls.Add(this.dtmstart);
+            this.panel1.Location = new System.Drawing.Point(24, 12);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(570, 210);
+            this.panel1.TabIndex = 0;
+            // 
+            // btnshow
+            // 
+            this.btnshow.Location = new System.Drawing.Point(230, 184);
+            this.btnshow.Name = "btnshow";
+            this.btnshow.Size = new System.Drawing.Size(75, 23);
+            this.btnshow.TabIndex = 4;
+            this.btnshow.Text = "Show";
+            this.btnshow.UseVisualStyleBackColor = true;
+            this.btnshow.Click += new System.EventHandler(this.btnshow_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(355, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(52, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "End Date";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(108, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(55, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Start Date";
+            // 
+            // dtmend
+            // 
+            this.dtmend.Location = new System.Drawing.Point(274, 22);
+            this.dtmend.Name = "dtmend";
+            this.dtmend.TabIndex = 1;
+            // 
+            // dtmstart
+            // 
+            this.dtmstart.Location = new System.Drawing.Point(29, 22);
+            this.dtmstart.Name = "dtmstart";
+            this.dtmstart.TabIndex = 0;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.reportViewer1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 228);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(866, 375);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Report";
+            // 
+            // reportViewer1
+            // 
+            this.reportViewer1.Location = new System.Drawing.Point(3, 16);
+            this.reportViewer1.Name = "reportViewer1";
+            this.reportViewer1.ServerReport.BearerToken = null;
+            this.reportViewer1.Size = new System.Drawing.Size(860, 353);
+            this.reportViewer1.TabIndex = 0;
+            // 
+            // ddlcustomer
+            // 
+            this.ddlcustomer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ddlcustomer.FormattingEnabled = true;
+            this.ddlcustomer.Location = new System.Drawing.Point(604, 45);
+            this.ddlcustomer.Name = "ddlcustomer";
+            this.ddlcustomer.Size = new System.Drawing.Size(262, 21);
+            this.ddlcustomer.TabIndex = 21;
+            // 
+            // btnOpenCustomerDialog
+            // 
+            this.btnOpenCustomerDialog.Location = new System.Drawing.Point(872, 45);
+            this.btnOpenCustomerDialog.Name = "btnOpenCustomerDialog";
+            this.btnOpenCustomerDialog.Size = new System.Drawing.Size(47, 21);
+            this.btnOpenCustomerDialog.TabIndex = 20;
+            this.btnOpenCustomerDialog.Text = ".....";
+            this.btnOpenCustomerDialog.UseVisualStyleBackColor = true;
+            this.btnOpenCustomerDialog.Click += new System.EventHandler(this.btnOpenCustomerDialog_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(599, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(194, 29);
+            this.label3.TabIndex = 19;
+            this.label3.Text = "Distributor Name";
+            // 
+            // frmDistributorProfit
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1115, 666);
+            this.Controls.Add(this.ddlcustomer);
+            this.Controls.Add(this.btnOpenCustomerDialog);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.panel1);
+            this.Name = "frmDistributorProfit";
+            this.Text = "frmreport";
+            this.Load += new System.EventHandler(this.frmreport_Load);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.MonthCalendar dtmend;
+        private System.Windows.Forms.MonthCalendar dtmstart;
+        private System.Windows.Forms.Button btnshow;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private Microsoft.Reporting.WinForms.ReportViewer reportViewer1;
+        private System.Windows.Forms.ComboBox ddlcustomer;
+        private System.Windows.Forms.Button btnOpenCustomerDialog;
+        private System.Windows.Forms.Label label3;
+    }
+}

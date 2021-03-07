@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-16"?>
+<SetupClass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <dbpath>D:\MyProjects2\Hotel_App\Hotel_App_General_Shadab_agency\Hotel_App\bin\Debug\Database1.accdb</dbpath>
+  <VendorSaleTaxFiler>0</VendorSaleTaxFiler>
+  <VendorWithHoldingTaxFiler>0</VendorWithHoldingTaxFiler>
+  <VendorSaleTaxNonFiler>0</VendorSaleTaxNonFiler>
+  <VendorWithHoldingTaxNonFiler>0</VendorWithHoldingTaxNonFiler>
+  <CustomerSalesTax>0</CustomerSalesTax>
+</SetupClass>
