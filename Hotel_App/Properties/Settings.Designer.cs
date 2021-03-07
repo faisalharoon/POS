@@ -12,7 +12,7 @@ namespace General_App.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -43,7 +43,7 @@ namespace General_App.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Tuck Shop")]
+        [global::System.Configuration.DefaultSettingValueAttribute("gggggg ggggg gggg ok")]
         public string Name {
             get {
                 return ((string)(this["Name"]));
@@ -52,9 +52,8 @@ namespace General_App.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\Other_Projects\\General_App\\Gener" +
-            "al_App-Naseem\\General_App\\bin\\Debug\\Database1.accdb;Persist Security Info=False;" +
-            "")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\MyProjects2\\Hotel_App\\Hotel_App_" +
+            "General\\Hotel_App\\bin\\Debug\\Database1.accdb;Persist Security Info=False;")]
         public string Constr {
             get {
                 return ((string)(this["Constr"]));
