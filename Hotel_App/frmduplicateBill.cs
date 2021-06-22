@@ -69,13 +69,13 @@ sale.SalesTax
                     Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
                 });
 
-                var dtBrush = tmpdtinitial.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("Code")) =="brush").Select(x => new {
-                    Name = Convert.ToString(x.Field<object>("Name")),
-                    Price = Convert.ToDouble(x.Field<object>("Price")),
-                    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
-                    Total = Convert.ToDouble(x.Field<object>("Total")),
-                    Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                }).ToList();
+                //var dtBrush = tmpdtinitial.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("Code")) =="brush").Select(x => new {
+                //    Name = Convert.ToString(x.Field<object>("Name")),
+                //    Price = Convert.ToDouble(x.Field<object>("Price")),
+                //    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
+                //    Total = Convert.ToDouble(x.Field<object>("Total")),
+                //    Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
+                //}).ToList();
 
 
                 //dtBrush.Add(new
@@ -88,13 +88,13 @@ sale.SalesTax
                 //});
 
 
-                var dtDiaper = tmpdtinitial.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code")) == "diaper").Select(x => new {
-                    Name = Convert.ToString(x.Field<object>("Name")),
-                    Price = Convert.ToDouble(x.Field<object>("Price")),
-                    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
-                    Total = Convert.ToDouble(x.Field<object>("Total")),
-                    Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                }).ToList();
+                //var dtDiaper = tmpdtinitial.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code")) == "diaper").Select(x => new {
+                //    Name = Convert.ToString(x.Field<object>("Name")),
+                //    Price = Convert.ToDouble(x.Field<object>("Price")),
+                //    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
+                //    Total = Convert.ToDouble(x.Field<object>("Total")),
+                //    Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
+                //}).ToList();
 
                 //dtDiaper.Add(new
                 //{
@@ -113,12 +113,12 @@ sale.SalesTax
 
                 try
                 {
-                    ReportDataSource reportDSDetail = new ReportDataSource("DataSet1", dtDiaper);                   
-                    reportViewer2.LocalReport.ReportPath = "../../Report1-Fullpage.rdlc";
+                    ReportDataSource reportDSDetail = new ReportDataSource("DataSet1", dtAll);                   
+                    reportViewer2.LocalReport.ReportPath = "../../Report1.rdlc";
                     reportViewer2.LocalReport.DataSources.Add(reportDSDetail);                   
                     reportViewer2.LocalReport.EnableExternalImages = true;
 
-                    reportDSDetail = new ReportDataSource("DataSet2", dtBrush);
+                    //reportDSDetail = new ReportDataSource("DataSet2", dtBrush);
                     reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
                 }
                 catch (Exception ex)
@@ -148,7 +148,7 @@ sale.SalesTax
 
 
                 p[1] = new ReportParameter("Total", total.ToString());
-                p[2] = new ReportParameter("GDiscount", dtAll.Sum(x => x.Discount).ToString());
+                p[2] = new ReportParameter("Discount", dtAll.Sum(x => x.Discount).ToString());
                 p[3] = new ReportParameter("GTotal", dtAll.Sum(x => x.Total).ToString());
                 p[4] = new ReportParameter("OrderNo", dtSale.Rows[0]["OrderNo"].ToString());
                 p[5] = new ReportParameter("Name", dtSale.Rows[0]["CustomerName"].ToString());
@@ -158,21 +158,21 @@ sale.SalesTax
                 p[9] = new ReportParameter("ShopAddress", XmlExtension.GetSetupValues().CompanyAddress);
 
 
-                p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));
-                p[11] = new ReportParameter("Mobile", Convert.ToString(dtCustomer.Rows[0]["Mobile"]));
-                p[12] = new ReportParameter("Address", Convert.ToString(dtCustomer.Rows[0]["Address"]));
+                //p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));
+                //p[11] = new ReportParameter("Mobile", Convert.ToString(dtCustomer.Rows[0]["Mobile"]));
+                //p[12] = new ReportParameter("Address", Convert.ToString(dtCustomer.Rows[0]["Address"]));
 
 
-                p[13] = new ReportParameter("Total2", dtBrush.Sum(x => x.Total).ToString());
-                p[14] = new ReportParameter("Total1", dtDiaper.Sum(x => x.Total).ToString());
+                //p[13] = new ReportParameter("Total2", dtBrush.Sum(x => x.Total).ToString());
+                //p[14] = new ReportParameter("Total1", dtDiaper.Sum(x => x.Total).ToString());
 
-                p[15] = new ReportParameter("Discount2", dtBrush.Sum(x => x.Discount).ToString());
-                p[16] = new ReportParameter("Discount1", dtDiaper.Sum(x => x.Discount).ToString());
+                //p[15] = new ReportParameter("Discount2", dtBrush.Sum(x => x.Discount).ToString());
+                //p[16] = new ReportParameter("Discount1", dtDiaper.Sum(x => x.Discount).ToString());
 
-                p[17] = new ReportParameter("GTotal2", (dtBrush.Sum(x => x.Total) - dtBrush.Sum(x => x.Discount)).ToString());
-                p[18] = new ReportParameter("GTotal1", (dtDiaper.Sum(x => x.Total) - dtDiaper.Sum(x => x.Discount)).ToString());
+                //p[17] = new ReportParameter("GTotal2", (dtBrush.Sum(x => x.Total) - dtBrush.Sum(x => x.Discount)).ToString());
+                //p[18] = new ReportParameter("GTotal1", (dtDiaper.Sum(x => x.Total) - dtDiaper.Sum(x => x.Discount)).ToString());
 
-                p[19] = new ReportParameter("FinalAmount", (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount)).ToString());
+                //p[19] = new ReportParameter("FinalAmount", (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount)).ToString());
 
                 //System.Threading.Thread.Sleep(1000);
 

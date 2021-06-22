@@ -24,8 +24,12 @@ namespace General_App
         private void textBox1_KeyUp(object sender, KeyEventArgs e)
         {
             dataGridView1.DataSource = DALAccess.ExecuteDataTable("select * from Item where Name like '%" + textBox1.Text + "%' order by id asc");
-        }
 
+            if (e.KeyCode == Keys.Enter)
+            {
+                dataGridView1.Select();
+            }
+        }
        
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -45,6 +49,12 @@ namespace General_App
         {
             DataTable dt = DALAccess.ExecuteDataTable("select * from Item order by id asc");
             dataGridView1.DataSource = dt;
+            textBox1.Select();
+        }
+
+        public void focusTextbox()
+        {
+            textBox1.Focus();
         }
      
 

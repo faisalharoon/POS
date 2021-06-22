@@ -32,6 +32,7 @@ namespace General_App
 
         DataTable Maindt;
         bool booljustloaded = false;
+        
         private void Form1_Load(object sender, EventArgs e)
         {
             this.dataGridView1.Columns["GrossTotal"].ReadOnly = true;
@@ -80,6 +81,32 @@ namespace General_App
             }
             this.reportViewer2.RefreshReport();
             dataGridView1.AutoGenerateColumns = false;
+
+            fillItemSearch();
+
+           
+        }
+
+        private void fillItemSearch()
+        {
+            try
+            {
+                AutoCompleteStringCollection coll = new AutoCompleteStringCollection();
+                DataTable dtCust = DALAccess.ExecuteDataTable("select * from item order by id asc");               
+                    for (int i = 0; i < dtCust.Rows.Count; i++)
+                    {
+                        coll.Add(dtCust.Rows[i]["Name"].ToString());
+                    }
+
+                
+               // txtItemName.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                //txtItemName.AutoCompleteSource = coll;
+            }
+            catch (Exception)
+            {
+
+    
+            }
         }
 
         private void LoadCustomerDropDown()
@@ -104,6 +131,7 @@ namespace General_App
         private void btnSearch_Click(object sender, EventArgs e)
         {
             frmItem frm = new frmItem();
+            frm.focusTextbox();
             DialogResult dr = frm.ShowDialog();
 
             if (dr == DialogResult.OK)
@@ -137,15 +165,26 @@ namespace General_App
                 DataTable dt = new DataTable();
                 if (txtItemName.Text.Contains("%"))
                 {
+                    string itemName = txtItemName.Text.Trim().Replace("%", "");
+                    DataTable dtitem = DALAccess.ExecuteDataTable("select * from item where name like '%" + itemName + "%'");
+                    if (dtitem != null && dtitem.Rows.Count > 0)
+                    {
+                        lblName.Text = dtitem.Rows[0]["Name"].ToString();
+                    }
+                    else
+                        lblName.Text = "";
+
                     if (e.KeyCode == Keys.Enter)
                     {
-                        string itemName = txtItemName.Text.Trim().Replace("%", "");
-                        DataTable dtitem = DALAccess.ExecuteDataTable("select * from item where name like '%" + itemName + "%'");
+
                         if (dtitem != null && dtitem.Rows.Count > 0)
                         {
-                            lblName.Text = dtitem.Rows[0]["Name"].ToString();
                             txtItemName.Text = dtitem.Rows[0]["ID"].ToString();
                             txtItemName.SelectionStart = txtItemName.Text.Length;
+                        }
+                        else
+                        {
+                            txtItemName.Text = "";
                         }
                     }
                 }
@@ -154,33 +193,19 @@ namespace General_App
 
                     if (txtItemName.Text != "")
                     {
-                        bool isitemid = true;
-                        try
-                        {
-                            int ItemID = Convert.ToInt32(txtItemName.Text);
-                            if (txtItemName.Text.Length < 7)
-                                dt = DALAccess.ExecuteDataTable("select * from Item where id=" + txtItemName.Text);
-                            else
-                                isitemid = false;
+                        dt = DALAccess.ExecuteDataTable("select * from Item");
 
-                        }
-                        catch (Exception exInt)
-                        {
-                            isitemid = false;
-                        }
+                        var dt2 = dt.AsEnumerable()
+                       .Where(row => Convert.ToString(row.Field<int>("ID")) == txtItemName.Text || row.Field<String>("BarCode") == txtItemName.Text)
+                       .OrderByDescending(row => row.Field<int>("ID"));
 
-                        if (!isitemid)
-                        {
-                            dt = DALAccess.ExecuteDataTable("select * from Item where [barcode]='" + txtItemName.Text + "'");
-                        }
 
-                        if (dt != null && dt.Rows.Count > 0)
-                        {
-                            lblName.Text = dt.Rows[0]["Name"].ToString();
 
-                            txtQuantity.Text = "1";
-                            txtQuantity.Focus();
-                            txtQuantity.SelectionStart = txtQuantity.Text.Length;
+                        if (dt2 != null && dt2.Count() > 0)
+                        {
+                            lblName.Text = dt2.First().Field<string>("Name");
+                            txtItemName.Text = Convert.ToString(dt2.First().Field<int>("ID"));
+                            txtItemName.SelectionStart = txtItemName.Text.Length;
                         }
                         else
                             lblName.Text = "";
@@ -189,9 +214,11 @@ namespace General_App
                         lblName.Text = "";
                 }
 
-                if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && !booljustloaded)
+                if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && lblName.Text!="")
                 {
+                    txtQuantity.Text = "1";
                     txtQuantity.Focus();
+                    txtQuantity.SelectionStart = txtQuantity.Text.Length;
                 }
 
                 booljustloaded = false;
@@ -262,7 +289,7 @@ namespace General_App
                         {
 
                             DataTable dt = DALAccess.ExecuteDataTable("select * from Item where ID=" + itemid);
-                            
+
 
                             if (Maindt != null)
                             {
@@ -282,7 +309,7 @@ namespace General_App
                                     Maindt.Rows[innerIndex]["Total"] = total.ToString();
                                     Maindt.Rows[innerIndex]["GrossTotal"] = gross.ToString();
                                     dataGridView1.DataSource = Maindt;
-                                    UpdateTotal(innerIndex,0);
+                                    UpdateTotal(innerIndex, 0);
                                 }
                                 else
                                 {
@@ -293,9 +320,9 @@ namespace General_App
                                         dr["Name"] = lblName.Text;
                                         dr["Quantity"] = txtQuantity.Text;
 
-                                        double SalePrice =Convert.ToDouble(dt.Rows[0]["SalePrice"]);
+                                        double SalePrice = Convert.ToDouble(dt.Rows[0]["SalePrice"]);
                                         double Quantity = Convert.ToDouble(txtQuantity.Text);
-                                        double total = SalePrice * Quantity;                                        
+                                        double total = SalePrice * Quantity;
                                         int itemcategoryId = Convert.ToInt32(dt.Rows[0]["ItemCategoryID"]);
                                         DataTable dtItemCategory = DALAccess.ExecuteDataTable("select * from ItemCategory where ID=" + itemcategoryId);
                                         double discountPercent = Convert.ToDouble(dtItemCategory.Rows[0]["DistributorProfitPercentage"]);
@@ -303,8 +330,8 @@ namespace General_App
                                         double gross = total - discountAmount;
 
                                         dr["Price"] = SalePrice.ToString();
-                                        dr["Total"] = total.ToString();                                        
-                                        dr["ItemCategoryID"] = dt.Rows[0]["ItemCategoryID"].ToString();                                        
+                                        dr["Total"] = total.ToString();
+                                        dr["ItemCategoryID"] = dt.Rows[0]["ItemCategoryID"].ToString();
                                         dr["Discount%"] = discountPercent.ToString();
                                         dr["code"] = dtItemCategory.Rows[0]["code"].ToString();
                                         dr["Discount"] = discountAmount;
@@ -314,7 +341,7 @@ namespace General_App
                                         Maindt.Rows.Add(dr);
                                         dataGridView1.DataSource = Maindt;
 
-                                        UpdateTotal(currentRow,0);
+                                        UpdateTotal(currentRow, 0);
                                     }
                                 }
                             }
@@ -334,7 +361,7 @@ namespace General_App
                         //var dis = Convert.ToDouble(txtdiscount.Text == "" ? "0" : txtdiscount.Text);
                         //var total2 = Math.Round((total * dis) / 100, 0);
 
-                       
+
 
                     }
                     else
@@ -401,7 +428,7 @@ namespace General_App
 
 
 
-                        string str = "insert into Sale (CustomerName,CreationDate,OrderNo,Discount,DiscountPercentage,Total,UserID,CustomerID,SalesTax) values ('" + customername + "','" + DateTime.Now + "'," + orderno + "," + discountAmount + "," + discount + "," + totalamount + "," + LoggedInUser.UserID + "," + ddlcustomer.SelectedValue + ","+ TaxAmount + ")";
+                        string str = "insert into Sale (CustomerName,CreationDate,OrderNo,Discount,DiscountPercentage,Total,UserID,CustomerID,SalesTax) values ('" + customername + "','" + DateTime.Now + "'," + orderno + "," + discountAmount + "," + discount + "," + totalamount + "," + LoggedInUser.UserID + "," + ddlcustomer.SelectedValue + "," + TaxAmount + ")";
                         int saleid = DALAccess.ExecuteNonQuery(str);
 
                         for (int i = 0; i < Maindt.Rows.Count; i++)
@@ -420,7 +447,7 @@ namespace General_App
 
                             DALAccess.ExecuteNonQuery(str);
                         }
-                        glbSaleID = saleid;                        
+                        glbSaleID = saleid;
                     }
                 }
                 else // update sale
@@ -485,7 +512,10 @@ namespace General_App
         {
             try
             {
-                string query = "insert into customerpayment(customerid,amounttopay,amount,balance,createdat,createdby,paiddate) values ("+ddlcustomer.SelectedValue+","+ totalAmountToPay + ",0,"+ totalAmountToPay + ",'"+DateTime.Now+"',"+LoggedInUser.UserID+",'"+DateTime.Now+"')";
+                double amountpaid = Convert.ToDouble(txtamountpaid.Text == "" ? "0" : txtamountpaid.Text);
+                double balance = totalAmountToPay - amountpaid;
+
+                string query = "insert into customerpayment(customerid,amounttopay,amount,balance,createdat,createdby,paiddate) values (" + ddlcustomer.SelectedValue + "," + totalAmountToPay + "," + amountpaid + "," + balance + ",'" + DateTime.Now + "'," + LoggedInUser.UserID + ",'" + DateTime.Now + "')";
                 DALAccess.ExecuteNonQuery(query);
             }
             catch (Exception)
@@ -515,7 +545,8 @@ namespace General_App
                 double grosstotal = (total - totaldisoucnt);
                 double gst = Math.Round((grosstotal * gstpercentage) / 100, 0);
 
-                var dtAll = Maindt.AsEnumerable().Select(x => new {
+                var dtAll = Maindt.AsEnumerable().Select(x => new
+                {
                     Name = Convert.ToString(x.Field<object>("Name")),
                     Price = Convert.ToDouble(x.Field<object>("Price")),
                     Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
@@ -524,16 +555,16 @@ namespace General_App
                     Discount = Convert.ToDouble(x.Field<object>("Discount"))
                 });
 
-                var dtBrush = Maindt.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code"))=="brush").Select(x=>new {
-                   Name= Convert.ToString(x.Field<object>("Name")),
-                    Price=Convert.ToDouble(x.Field<object>("Price")),
-                    Quantity=Convert.ToInt32(x.Field<object>("Quantity")),
-                    Total=Convert.ToDouble(x.Field<object>("Total")),
-                    //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%"))* Convert.ToDouble(x.Field<object>("Total")))/100,0)
-                    Discount = Convert.ToDouble(x.Field<object>("Discount"))
-                }).ToList();
+                //var dtBrush = Maindt.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code"))=="brush").Select(x=>new {
+                // Name= Convert.ToString(x.Field<object>("Name")),
+                // Price=Convert.ToDouble(x.Field<object>("Price")),
+                //Quantity=Convert.ToInt32(x.Field<object>("Quantity")),
+                //Total=Convert.ToDouble(x.Field<object>("Total")),
+                //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%"))* Convert.ToDouble(x.Field<object>("Total")))/100,0)
+                // Discount = Convert.ToDouble(x.Field<object>("Discount"))
+                // }).ToList();
 
-                
+
                 //dtBrush.Add(new
                 //{
                 //    Name = "Total",
@@ -544,14 +575,17 @@ namespace General_App
                 //});
 
 
-                var dtDiaper = Maindt.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code")) == "diaper").Select(x=>new {
-                    Name = Convert.ToString(x.Field<object>("Name")),
-                    Price = Convert.ToDouble(x.Field<object>("Price")),
-                    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
-                    Total = Convert.ToDouble(x.Field<object>("Total")),
-                    //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                    Discount = Convert.ToDouble(x.Field<object>("Discount"))
-                }).ToList();
+                var dtDiaper = Maindt.AsEnumerable()
+                    //.Where(x => Convert.ToString(x.Field<object>("code")) == "diaper")
+                    .Select(x => new
+                    {
+                        Name = Convert.ToString(x.Field<object>("Name")),
+                        Price = Convert.ToDouble(x.Field<object>("Price")),
+                        Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
+                        Total = Convert.ToDouble(x.Field<object>("Total")),
+                        //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
+                        Discount = Convert.ToDouble(x.Field<object>("Discount"))
+                    }).ToList();
 
                 //dtDiaper.Add(new
                 //{
@@ -565,14 +599,15 @@ namespace General_App
 
                 try
                 {
-                    ReportDataSource reportDSDetail = new ReportDataSource("DataSet1", dtDiaper);                    
-                    reportViewer2.LocalReport.ReportPath = "../../Report1-Fullpage.rdlc";
+                    ReportDataSource reportDSDetail = new ReportDataSource("DataSet1", dtDiaper);
+                    //reportViewer2.LocalReport.ReportPath = "../../Report1-Fullpage.rdlc";
+                    reportViewer2.LocalReport.ReportPath = "../../Report1.rdlc";
                     reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
                     reportViewer2.LocalReport.EnableExternalImages = true;
 
 
-                    reportDSDetail = new ReportDataSource("DataSet2", dtBrush);
-                    reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
+                    //reportDSDetail = new ReportDataSource("DataSet2", dtBrush);
+                    //reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
                 }
                 catch (Exception ex)
                 {
@@ -580,15 +615,15 @@ namespace General_App
                 }
 
 
-                DataTable dtCustomer= DALAccess.ExecuteDataTable("select * from customer where id="+ddlcustomer.SelectedValue);
+                DataTable dtCustomer = DALAccess.ExecuteDataTable("select * from customer where id=" + ddlcustomer.SelectedValue);
 
 
-                ReportParameter[] p = new ReportParameter[20];
+                ReportParameter[] p = new ReportParameter[10];
                 p[0] = new ReportParameter("Date", DateTime.Now.ToString());
 
 
                 p[1] = new ReportParameter("Total", total.ToString());
-                p[2] = new ReportParameter("GDiscount", dtAll.Sum(x=>x.Discount).ToString());
+                p[2] = new ReportParameter("Discount", dtAll.Sum(x => x.Discount).ToString());
                 p[3] = new ReportParameter("GTotal", dtAll.Sum(x => x.Total).ToString());
                 p[4] = new ReportParameter("OrderNo", orderno.ToString());
                 p[5] = new ReportParameter("Name", ddlcustomer.Text);
@@ -598,21 +633,21 @@ namespace General_App
                 p[9] = new ReportParameter("ShopAddress", XmlExtension.GetSetupValues().CompanyAddress);
 
 
-                p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));
-                p[11] = new ReportParameter("Mobile", Convert.ToString(dtCustomer.Rows[0]["Mobile"]));
-                p[12] = new ReportParameter("Address", Convert.ToString(dtCustomer.Rows[0]["Address"]));
+                //p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));
+                //p[11] = new ReportParameter("Mobile", Convert.ToString(dtCustomer.Rows[0]["Mobile"]));
+                //p[12] = new ReportParameter("Address", Convert.ToString(dtCustomer.Rows[0]["Address"]));
 
 
-                p[13] = new ReportParameter("Total2", dtBrush.Sum(x=>x.Total).ToString());
-                p[14] = new ReportParameter("Total1", dtDiaper.Sum(x => x.Total).ToString());
+                //p[13] = new ReportParameter("Total2", dtBrush.Sum(x=>x.Total).ToString());
+                //p[14] = new ReportParameter("Total1", dtDiaper.Sum(x => x.Total).ToString());
 
-                p[15] = new ReportParameter("Discount2", dtBrush.Sum(x => x.Discount).ToString());
-                p[16] = new ReportParameter("Discount1", dtDiaper.Sum(x => x.Discount).ToString());
+                //p[15] = new ReportParameter("Discount2", dtBrush.Sum(x => x.Discount).ToString());
+                //p[16] = new ReportParameter("Discount1", dtDiaper.Sum(x => x.Discount).ToString());
 
-                p[17] = new ReportParameter("GTotal2", (dtBrush.Sum(x => x.Total)-dtBrush.Sum(x => x.Discount)).ToString());
-                p[18] = new ReportParameter("GTotal1", (dtDiaper.Sum(x => x.Total)-dtDiaper.Sum(x => x.Discount)).ToString());
+                //p[17] = new ReportParameter("GTotal2", (dtBrush.Sum(x => x.Total)-dtBrush.Sum(x => x.Discount)).ToString());
+                //p[18] = new ReportParameter("GTotal1", (dtDiaper.Sum(x => x.Total)-dtDiaper.Sum(x => x.Discount)).ToString());
 
-                p[19] = new ReportParameter("FinalAmount", (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount)).ToString());
+                //p[19] = new ReportParameter("FinalAmount", (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount)).ToString());
 
 
                 double totalnetAmount = (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount));
@@ -643,7 +678,7 @@ namespace General_App
 
                 try
                 {
-                    reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
+                    //reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
                 }
                 catch (Exception ex)
                 {
@@ -750,8 +785,9 @@ namespace General_App
                     txtdiscount.Text = "0";
                     txttotal.Text = "0";
                     txtnet.Text = "0";
+                    txtamountpaid.Text = "0";
 
-                    webBrowser1.DocumentText = "";
+                    //webBrowser1.DocumentText = "";
                     reportViewer2.Clear();
                     btnViewBill.Visible = false;
 
@@ -777,8 +813,26 @@ namespace General_App
                 }
                 if (e.Control && e.KeyCode == Keys.O)
                 {
-                    frmAddEntry f = new frmAddEntry();
-                    f.Show();
+                    //frmAddEntry f = new frmAddEntry();
+                    //f.Show();
+                    frmItem frm = new frmItem();
+                    frm.focusTextbox();
+                    DialogResult dr = frm.ShowDialog();
+
+                    if (dr == DialogResult.OK)
+                    {
+                        txtItemName.Text = frm.ItemID;
+                        lblName.Text = frm.ItemName;
+                        txtItemName.Focus();
+                        txtItemName.SelectionStart = txtItemName.Text.Length;
+
+                        txtQuantity.Text = "1";
+                        txtQuantity.Focus();
+                        txtQuantity.SelectionStart = txtQuantity.Text.Length;
+
+                    }
+                    else
+                        txtQuantity.Text = "";
                 }
                 if (e.Control && e.KeyCode == Keys.G)
                 {
@@ -789,6 +843,11 @@ namespace General_App
                 {
                     frmAddgameType f = new frmAddgameType();
                     f.Show();
+                }
+                if (e.Control && e.KeyCode == Keys.P)
+                {
+                    txtamountpaid.Focus();
+                    txtamountpaid.SelectionStart = txtamountpaid.Text.Length;
                 }
             }
             catch (Exception ex)
@@ -835,7 +894,7 @@ namespace General_App
                 txtnet.Focus();
             }
             txtnet.SelectionStart = txtnet.Text.Length;
-            UpdateTotal(-1,0);
+            UpdateTotal(-1, 0);
         }
 
 
@@ -869,8 +928,8 @@ namespace General_App
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {           
-           
+        {
+
             try
             {
 
@@ -892,14 +951,14 @@ namespace General_App
                     //UpdateTotal(e.RowIndex);
                 }
 
-                UpdateTotal(-1,e.ColumnIndex);
+                UpdateTotal(-1, e.ColumnIndex);
             }
             catch (Exception)
             {
             }
         }
 
-        private void UpdateTotal(int rowinde,int colIndex)
+        private void UpdateTotal(int rowinde, int colIndex)
         {
             try
             {
@@ -912,19 +971,20 @@ namespace General_App
 
 
                     var singleprice = Convert.ToDouble(Maindt.Rows[rowinde]["Quantity"]);
-                    var singleQuantity = Convert.ToDouble(Maindt.Rows[rowinde]["Price"]);                   
-                    var singleDiscountPercentage = Convert.ToDouble(Maindt.Rows[rowinde]["Discount%"]);                    
+                    var singleQuantity = Convert.ToDouble(Maindt.Rows[rowinde]["Price"]);
+                    var singleDiscountPercentage = Convert.ToDouble(Maindt.Rows[rowinde]["Discount%"]);
                     var singleTotal = singleprice * singleQuantity;
-                    var singleDiscount = Common.Percentage(singleTotal, singleDiscountPercentage);
+                    //var singleDiscount = Common.Percentage(singleTotal, singleDiscountPercentage);
+                    var singleDiscount = Convert.ToDouble(DiscountInGrid);
 
                     if (colIndex == dataGridView1.Columns["Discount"].Index)
                     {
-                        if(Convert.ToDouble(DiscountInGrid)>=0)                            
-                        singleDiscount = Convert.ToDouble(DiscountInGrid);
+                        if (Convert.ToDouble(DiscountInGrid) >= 0)
+                            singleDiscount = Convert.ToDouble(DiscountInGrid);
                     }
 
-                    Maindt.Rows[rowinde]["Total"] = singleTotal.ToString();                   
-                    Maindt.Rows[rowinde]["Discount"] = singleDiscount.ToString();                  
+                    Maindt.Rows[rowinde]["Total"] = singleTotal.ToString();
+                    Maindt.Rows[rowinde]["Discount"] = singleDiscount.ToString();
                     Maindt.Rows[rowinde]["GrossTotal"] = (singleTotal - singleDiscount).ToString();
                     dataGridView1.DataSource = Maindt;
                 }
@@ -1098,7 +1158,7 @@ namespace General_App
 
         private void PrintDocument(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            webBrowser1.ShowPrintDialog();
+            //webBrowser1.ShowPrintDialog();
             //webBrowser1.ShowPageSetupDialog();
 
 
@@ -1172,11 +1232,29 @@ namespace General_App
 
         private void txtnet_KeyUp(object sender, KeyEventArgs e)
         {
-            if (txtnet.Text == "")
-                return;
+            //if (txtnet.Text == "")
+            //return;
 
-            PrintDiscount(e.KeyCode);
-            btnViewBill.Visible = true;
+            //PrintDiscount(e.KeyCode);
+            //btnViewBill.Visible = true;
+
+            //LocalReport report = new LocalReport();
+            //report.ReportEmbeddedResource = "Your.Reports.Path.rdlc";
+            //report.DataSources.Add(new ReportDataSource("DataSet1", getYourDatasource()));
+            //report.PrintToPrinter();
+
+            //this.reportViewer2.LocalReport.Print();
+
+            //txtnet.Text = txtdiscount.Text.Replace(Environment.NewLine, "");
+            //txtnet.Text = txtdiscount.Text.Replace("\t", "");
+
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+            {
+                txtamountpaid.Focus();
+            }
+            txtamountpaid.SelectionStart = txtamountpaid.Text.Length;
+
+
         }
 
         private void btnsaveandPrint_Click(object sender, EventArgs e)
@@ -1205,8 +1283,9 @@ namespace General_App
 
         }
 
-        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e){            
-            UpdateTotal(e.RowIndex,e.ColumnIndex);           
+        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            UpdateTotal(e.RowIndex, e.ColumnIndex);
         }
 
         private void customerPaymentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1312,5 +1391,46 @@ namespace General_App
             frmAddVendorInvoices f = new frmAddVendorInvoices();
             f.Show();
         }
+
+        private void distributorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtamountpaid_KeyUp(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (txtnet.Text == "")
+                    return;
+
+
+                if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+                {
+                    PrintDiscount(e.KeyCode);
+                    this.reportViewer2.LocalReport.Print();
+                }
+
+
+                //btnViewBill.Visible = true;
+
+                //LocalReport report = new LocalReport();
+                //report.ReportEmbeddedResource = "Your.Reports.Path.rdlc";
+                //report.DataSources.Add(new ReportDataSource("DataSet1", getYourDatasource()));
+                //report.PrintToPrinter();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+
+
+
     }
 }

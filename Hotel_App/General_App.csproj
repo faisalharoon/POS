@@ -320,6 +320,7 @@
       <DependentUpon>frmWizard.cs</DependentUpon>
     </Compile>
     <Compile Include="HardwareInfo.cs" />
+    <Compile Include="LocalReportExtensions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />

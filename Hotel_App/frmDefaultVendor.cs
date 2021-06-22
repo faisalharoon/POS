@@ -36,8 +36,11 @@ namespace General_App
         {
             this.dataGridView1.Columns["Quantity"].ReadOnly = false;
             this.dataGridView1.Columns["Total"].ReadOnly = true;
+            this.dataGridView1.Columns["GrossTotal"].ReadOnly = true;
 
-            booljustloaded = true;
+            lblselecteditem.Text = "";
+
+            booljustloaded = false;
 
            
 
@@ -55,6 +58,9 @@ namespace General_App
                 Maindt.Columns.Add("Quantity");
                 Maindt.Columns.Add("Price");
                 Maindt.Columns.Add("Total");
+
+                Maindt.Columns.Add("Discount");
+                Maindt.Columns.Add("GrossTotal");
 
                 if (!string.IsNullOrEmpty(General_App.Properties.Settings.Default.gst))
                     txtgst.Text = General_App.Properties.Settings.Default.gst;
@@ -99,7 +105,7 @@ namespace General_App
             if (dr == DialogResult.OK)
             {
                 txtItemName.Text = frm.ItemID;
-                lblName.Text = frm.ItemName;
+                lblselecteditem.Text = frm.ItemName;
                 txtItemName.Focus();
                 txtItemName.SelectionStart = txtItemName.Text.Length;
             }
@@ -126,7 +132,7 @@ namespace General_App
                         DataTable dtitem = DALAccess.ExecuteDataTable("select * from item where name like '%" + itemName + "%'");
                         if (dtitem != null && dtitem.Rows.Count > 0)
                         {
-                            lblName.Text = dtitem.Rows[0]["Name"].ToString();
+                            lblselecteditem.Text = dtitem.Rows[0]["Name"].ToString();
                             txtItemName.Text = dtitem.Rows[0]["ID"].ToString();
                             txtItemName.SelectionStart = txtItemName.Text.Length;
                         }
@@ -159,13 +165,13 @@ namespace General_App
 
                         if (dt != null && dt.Rows.Count > 0)
                         {
-                            lblName.Text = dt.Rows[0]["Name"].ToString();
+                            lblselecteditem.Text = dt.Rows[0]["Name"].ToString();
                         }
                         else
-                            lblName.Text = "";
+                            lblselecteditem.Text = "";
                     }
                     else
-                        lblName.Text = "";
+                        lblselecteditem.Text = "";
                 }
 
                 if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && !booljustloaded)
@@ -191,6 +197,7 @@ namespace General_App
 
         private void txtQuantity_KeyUp(object sender, KeyEventArgs e)
         {
+            
             txtQuantity.Text = txtQuantity.Text.Replace(Environment.NewLine, "");
             txtQuantity.Text = txtQuantity.Text.Replace("\t", "");
 
@@ -202,7 +209,7 @@ namespace General_App
             {
                 if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
                 {
-                    if (lblName.Text != "")
+                    if (lblselecteditem.Text != "")
                     {
                         txtItemName.Focus();
                         string itemid = Convert.ToString(txtItemName.Text);
@@ -224,9 +231,23 @@ namespace General_App
                                     var alreadyCount = Convert.ToInt32(innerGridItem.Field<object>("Quantity")) + quantity;
                                     var innerIndex = Maindt.AsEnumerable().ToList().IndexOf(innerGridItem);
 
+                                    //double discountPercent = Convert.ToDouble(Maindt.Rows[innerIndex]["Discount%"]);
+                                    double discountPercent = 0;
+                                    double total = (Convert.ToDouble(alreadyCount) * Convert.ToDouble(Maindt.Rows[innerIndex]["Price"]));
+                                    //double discountAmount = Math.Round((total * discountPercent) / 100, 0);
+                                    double discountAmount = Convert.ToDouble(Maindt.Rows[innerIndex]["Discount"]);
+                                    double gross = total - discountAmount;
+
                                     Maindt.Rows[innerIndex]["Quantity"] = alreadyCount;
-                                    Maindt.Rows[innerIndex]["Total"] = (Convert.ToDouble(alreadyCount) * Convert.ToDouble(Maindt.Rows[innerIndex]["Price"])).ToString();
+                                    Maindt.Rows[innerIndex]["Discount"] = discountAmount.ToString();
+                                    Maindt.Rows[innerIndex]["Total"] = total.ToString();
+                                    Maindt.Rows[innerIndex]["GrossTotal"] = gross.ToString();
                                     dataGridView1.DataSource = Maindt;
+                                    UpdateTotal(innerIndex, 0);
+
+                                    //Maindt.Rows[innerIndex]["Quantity"] = alreadyCount;
+                                    //Maindt.Rows[innerIndex]["Total"] = (Convert.ToDouble(alreadyCount) * Convert.ToDouble(Maindt.Rows[innerIndex]["Price"])).ToString();
+                                    //dataGridView1.DataSource = Maindt;
 
                                 }
                                 else
@@ -235,14 +256,36 @@ namespace General_App
                                     {
                                         DataRow dr = Maindt.NewRow();
                                         dr["ID"] = txtItemName.Text;
-                                        dr["Name"] = lblName.Text;
+                                        dr["Name"] = lblselecteditem.Text;
                                         dr["Quantity"] = txtQuantity.Text;
 
-                                        dr["Price"] = dt.Rows[0]["PurchasePrice"].ToString();
-                                        dr["Total"] = (Convert.ToDouble(txtQuantity.Text) * Convert.ToDouble(dt.Rows[0]["PurchasePrice"])).ToString();
 
+
+                                        double SalePrice = Convert.ToDouble(dt.Rows[0]["PurchasePrice"]);
+                                        double Quantity = Convert.ToDouble(txtQuantity.Text);
+                                        double total = SalePrice * Quantity;
+
+                                        //double discountAmount = Math.Round((total * discountPercent) / 100, 0);
+                                        double discountAmount = Convert.ToDouble(0) ;
+                                        double gross = total - discountAmount;
+
+                                        //dr["Price"] = dt.Rows[0]["PurchasePrice"].ToString();
+                                        //dr["Total"] = (Convert.ToDouble(txtQuantity.Text) * Convert.ToDouble(dt.Rows[0]["PurchasePrice"])).ToString();
+
+                                        //.Rows.Add(dr);
+                                        //dataGridView1.DataSource = Maindt;
+
+
+                                        dr["Price"] = SalePrice.ToString();
+                                        dr["Total"] = total.ToString();                                      
+                                        dr["Discount"] = discountAmount;
+                                        dr["GrossTotal"] = gross;
+
+                                        int currentRow = Maindt.Rows.Count;
                                         Maindt.Rows.Add(dr);
                                         dataGridView1.DataSource = Maindt;
+
+                                        UpdateTotal(currentRow, 0);
                                     }
                                 }
                             }
@@ -253,7 +296,7 @@ namespace General_App
 
                         txtQuantity.Text = "";
                         txtItemName.Text = "";
-                        lblName.Text = "";
+                        lblselecteditem.Text = "";
 
                         //var total = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<string>("Total")));
                         //txttotal.Text = total.ToString();
@@ -261,14 +304,14 @@ namespace General_App
 
                         //var dis = Convert.ToDouble(txtdiscount.Text == "" ? "0" : txtdiscount.Text);
                         //var total2 = Math.Round((total * dis) / 100, 0);
-                        UpdateTotal(0);
+                        //UpdateTotal(0,-1);
                     }
                     else
                     {
 
                         txtQuantity.Text = "1";
                         txtItemName.Text = "";
-                        lblName.Text = "";
+                        lblselecteditem.Text = "";
 
                         txtItemName.Focus();
                     }
@@ -384,7 +427,7 @@ namespace General_App
                         {
                             int itemid = Convert.ToInt32(Maindt.Rows[i]["ID"]);
                             double price = Convert.ToDouble(Maindt.Rows[i]["Price"]);
-                            int Quantity = Convert.ToInt32(Maindt.Rows[i]["stock"]);
+                            int Quantity = Convert.ToInt32(Maindt.Rows[i]["Quantity"]);
                             double total = price * Quantity;
 
                             DataTable dtpurchase = DALAccess.ExecuteDataTable("select purchaseprice from item where id=" + itemid);
@@ -400,10 +443,35 @@ namespace General_App
                     }
                 }
                 PrintReport(orderno);
+                ClearAllControls();
             }
             catch (Exception es)
             {
                 MessageBox.Show(es.Message);
+            }
+        }
+
+        private void ClearAllControls()
+        {
+            dataGridView1.DataSource = null;
+            txtamountpaid.Text = "0";
+            txtdiscount.Text = "0";
+            txttotal.Text = "0";
+        }
+
+        private void InsertIntoVendorPayment(double totalAmountToPay)
+        {
+            try
+            {
+                double amountpaid = Convert.ToDouble(txtamountpaid.Text == "" ? "0" : txtamountpaid.Text);
+                double balance = totalAmountToPay-amountpaid;
+               
+
+                string query = "insert into vendorpayment(vendorid,amounttopay,amount,balance,createdat,createdby,paiddate) values (" + ddlcustomer.SelectedValue + "," + totalAmountToPay + "," + amountpaid + "," + balance + ",'" + DateTime.Now + "'," + LoggedInUser.UserID + ",'" + DateTime.Now + "')";
+                DALAccess.ExecuteNonQuery(query);
+            }
+            catch (Exception)
+            {
             }
         }
 
@@ -496,7 +564,7 @@ namespace General_App
 
                 try
                 {
-                    reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
+                    //reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
                 }
                 catch (Exception ex)
                 {
@@ -546,17 +614,17 @@ namespace General_App
             }
         }
 
-        private void InsertIntoVendorPayment(double totalAmountToPay)
-        {
-            try
-            {
-                string query = "insert into Vendorpayment(vendorid,amounttopay,amount,balance,createdat,createdby,paiddate) values (" + ddlcustomer.SelectedValue + "," + totalAmountToPay + ",0," + totalAmountToPay + ",'" + DateTime.Now + "'," + LoggedInUser.UserID + ",'" + DateTime.Now + "')";
-                DALAccess.ExecuteNonQuery(query);
-            }
-            catch (Exception)
-            {
-            }
-        }
+        //private void InsertIntoVendorPayment(double totalAmountToPay)
+        //{
+        //    try
+        //    {
+        //        string query = "insert into Vendorpayment(vendorid,amounttopay,amount,balance,createdat,createdby,paiddate) values (" + ddlcustomer.SelectedValue + "," + totalAmountToPay + ",0," + totalAmountToPay + ",'" + DateTime.Now + "'," + LoggedInUser.UserID + ",'" + DateTime.Now + "')";
+        //        DALAccess.ExecuteNonQuery(query);
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //}
 
         int printcount = 0;
         public void PrintSales(object sender, RenderingCompleteEventArgs e)
@@ -590,7 +658,7 @@ namespace General_App
                     if (dr == DialogResult.OK)
                     {
                         txtItemName.Text = frm.ItemID;
-                        lblName.Text = frm.ItemName;
+                        lblselecteditem.Text = frm.ItemName;
                         txtItemName.Focus();
                         txtItemName.SelectionStart = txtItemName.Text.Length;
                     }
@@ -616,7 +684,7 @@ namespace General_App
                     txttotal.Text = "0";
                     txtnet.Text = "0";
 
-                    webBrowser1.DocumentText = "";
+                    //webBrowser1.DocumentText = "";
                     reportViewer2.Clear();
 
                     glbSaleID = -1;
@@ -649,10 +717,13 @@ namespace General_App
                     frmTicket f = new frmTicket();
                     f.Show();
                 }
-                if (e.Control && e.KeyCode == Keys.Z)
+                if (e.Control && e.KeyCode == Keys.P)
                 {
-                    frmAddgameType f = new frmAddgameType();
-                    f.Show();
+                    //frmAddgameType f = new frmAddgameType();
+                    //f.Show();
+
+                    txtamountpaid.Focus();
+                    txtamountpaid.SelectionStart = txtamountpaid.Text.Length;
                 }
             }
             catch (Exception ex)
@@ -743,6 +814,13 @@ namespace General_App
                     Maindt.Rows.RemoveAt(e.RowIndex);
                     dataGridView1.DataSource = Maindt;
 
+                    var total = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<string>("Total")));
+                    txttotal.Text = total.ToString();
+                    txtnet.Text = total.ToString();
+
+                    var dis = Convert.ToDouble(txtdiscount.Text == "" ? "0" : txtdiscount.Text);
+                    var total2 = Math.Round((total * dis) / 100, 0);
+
                     //var total = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<string>("Total")));
                     //txttotal.Text = total.ToString();
                     //txtnet.Text = total.ToString();
@@ -750,19 +828,21 @@ namespace General_App
                     //var dis = Convert.ToDouble(txtdiscount.Text == "" ? "0" : txtdiscount.Text);
                     //var total2 = Math.Round((total * dis) / 100, 0);
 
-                    UpdateTotal(0);
+                    //UpdateTotal(0);
                 }
                 else
                 {
                     //UpdateTotal(e.RowIndex);
                 }
+
+                UpdateTotal(-1, e.ColumnIndex);
             }
             catch (Exception)
             {
             }
         }
 
-        private void UpdateTotal(int rowinde)
+        private void UpdateTotal(int rowinde, int colIndex)
         {
             try
             {
@@ -771,24 +851,57 @@ namespace General_App
 
                     string PriceInGrid = Convert.ToString(dataGridView1.Rows[rowinde].Cells["Price"].Value);
                     string QuantityInGrid = Convert.ToString(dataGridView1.Rows[rowinde].Cells["Quantity"].Value);
-
-                    var price = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<string>("Price")) * Convert.ToDouble(x.Field<string>("Quantity")));
-
-                    txttotal.Text = price.ToString();
-
-                    var discount = Convert.ToDouble(txtdiscount.Text);
-                    var discountAmount = Math.Round((price * discount) / 100, 0);
-                    var NetAmount = price - discountAmount;
-                    txtnet.Text = NetAmount.ToString();
+                    string DiscountInGrid = Convert.ToString(dataGridView1.Rows[rowinde].Cells["Discount"].Value);
 
 
                     var singleprice = Convert.ToDouble(Maindt.Rows[rowinde]["Quantity"]);
                     var singleQuantity = Convert.ToDouble(Maindt.Rows[rowinde]["Price"]);
+                    //var singleDiscountPercentage = Convert.ToDouble(Maindt.Rows[rowinde]["Discount%"]);
+                    var singleDiscountPercentage = 0;
+                    var singleTotal = singleprice * singleQuantity;
+                    //var singleDiscount = Common.Percentage(singleTotal, singleDiscountPercentage);
+                    var singleDiscount = Convert.ToDouble(DiscountInGrid);
 
+                    if (colIndex == dataGridView1.Columns["Discount"].Index)
+                    {
+                        if (Convert.ToDouble(DiscountInGrid) >= 0)
+                            singleDiscount = Convert.ToDouble(DiscountInGrid);
+                    }
 
-                    Maindt.Rows[rowinde]["Total"] = Convert.ToDouble(singleprice * singleQuantity).ToString();
+                    Maindt.Rows[rowinde]["Total"] = singleTotal.ToString();
+                    Maindt.Rows[rowinde]["Discount"] = singleDiscount.ToString();
+                    Maindt.Rows[rowinde]["GrossTotal"] = (singleTotal - singleDiscount).ToString();
                     dataGridView1.DataSource = Maindt;
                 }
+
+
+
+
+                try
+                {
+                    var price = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("Price")) * Convert.ToDouble(x.Field<object>("Quantity")));
+                    var discountGridAmount = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("Discount")));
+
+                    var discountPercentage = Convert.ToDouble(txtdiscount.Text);
+                    var discountAmount = 0.0;
+
+                    if (discountPercentage > 0)
+                        discountAmount = Math.Round((price * discountPercentage) / 100, 0);
+                    else
+                        discountAmount = discountGridAmount;
+
+                    var NetAmount = price - discountAmount;
+
+                    txttotal.Text = price.ToString();
+                    txtnet.Text = NetAmount.ToString();
+                }
+                catch (Exception)
+                {
+                }
+
+
+
+
             }
             catch (Exception)
             {
@@ -930,7 +1043,7 @@ namespace General_App
 
         private void PrintDocument(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            webBrowser1.ShowPrintDialog();
+            //webBrowser1.ShowPrintDialog();
             //webBrowser1.ShowPageSetupDialog();
 
 
@@ -1007,7 +1120,16 @@ namespace General_App
             if (txtnet.Text == "")
                 return;
 
-            PrintDiscount(e.KeyCode);
+
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+            {
+                txtamountpaid.Focus();
+            }
+            txtamountpaid.SelectionStart = txtamountpaid.Text.Length;
+
+           
+
+            //PrintDiscount(e.KeyCode);
         }
 
         private void btnsaveandPrint_Click(object sender, EventArgs e)
@@ -1035,7 +1157,7 @@ namespace General_App
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            UpdateTotal(e.RowIndex);
+            UpdateTotal(e.RowIndex,-1);
         }
 
         private void customerPaymentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1048,6 +1170,15 @@ namespace General_App
         {
             frmAddCustomerPayment f = new frmAddCustomerPayment();
             f.Show();
+        }
+
+        private void txtamountpaid_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+            {
+                PrintDiscount(e.KeyCode);
+                this.reportViewer2.LocalReport.Print();
+            }
         }
     }
 }

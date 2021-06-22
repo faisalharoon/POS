@@ -637,7 +637,6 @@ C:\Code\POS\POS\Hotel_App\bin\Debug\pt\Microsoft.ReportViewer.WinForms.resources
 C:\Code\POS\POS\Hotel_App\bin\Debug\ru\Microsoft.ReportViewer.WinForms.resources.dll
 C:\Code\POS\POS\Hotel_App\bin\Debug\zh-CHS\Microsoft.ReportViewer.WinForms.resources.dll
 C:\Code\POS\POS\Hotel_App\bin\Debug\zh-CHT\Microsoft.ReportViewer.WinForms.resources.dll
-C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.csprojAssemblyReference.cache
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.frmAddgameType.resources
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.frmAddCustomer.resources
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.frmAddCustomerPayment.resources
@@ -680,3 +679,6 @@ C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.csproj.CoreCompileInputs.cache
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.csproj.CopyComplete
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.exe
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.pdb
+C:\Code\POS\POS\Hotel_App\obj\Debug\RdlCompile.cache
+C:\Code\POS\POS\Hotel_App\obj\Debug\RdlCompile.compiled
+C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.csprojAssemblyReference.cache
