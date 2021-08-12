@@ -411,7 +411,6 @@
             this.groupBox4.TabIndex = 3;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Print Option";
-            this.groupBox4.Visible = false;
             // 
             // reportViewer2
             // 

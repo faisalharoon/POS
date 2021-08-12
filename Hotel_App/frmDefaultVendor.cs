@@ -564,7 +564,7 @@ namespace General_App
 
                 try
                 {
-                    //reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
+                    reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
                 }
                 catch (Exception ex)
                 {
@@ -1177,7 +1177,7 @@ namespace General_App
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
             {
                 PrintDiscount(e.KeyCode);
-                this.reportViewer2.LocalReport.Print();
+                //this.reportViewer2.LocalReport.Print();
             }
         }
     }

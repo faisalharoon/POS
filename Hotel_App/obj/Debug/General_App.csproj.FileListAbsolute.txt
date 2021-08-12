@@ -681,4 +681,5 @@ C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.exe
 C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.pdb
 C:\Code\POS\POS\Hotel_App\obj\Debug\RdlCompile.cache
 C:\Code\POS\POS\Hotel_App\obj\Debug\RdlCompile.compiled
-C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.csprojAssemblyReference.cache
+C:\Code\POS\POS\Hotel_App\bin\Debug\Zen.Barcode.Core.dll
+C:\Code\POS\POS\Hotel_App\obj\Debug\General_App.frmItemBarcode.resources

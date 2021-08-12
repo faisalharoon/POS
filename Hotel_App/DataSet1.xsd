@@ -68,6 +68,14 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="BarcodeDT" msprop:Generator_TableClassName="BarcodeDTDataTable" msprop:Generator_TableVarName="tableBarcodeDT" msprop:Generator_RowChangedName="BarcodeDTRowChanged" msprop:Generator_TablePropName="BarcodeDT" msprop:Generator_RowDeletingName="BarcodeDTRowDeleting" msprop:Generator_RowChangingName="BarcodeDTRowChanging" msprop:Generator_RowEvHandlerName="BarcodeDTRowChangeEventHandler" msprop:Generator_RowDeletedName="BarcodeDTRowDeleted" msprop:Generator_RowClassName="BarcodeDTRow" msprop:Generator_UserTableName="BarcodeDT" msprop:Generator_RowEvArgName="BarcodeDTRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Barcode" msprop:Generator_ColumnVarNameInTable="columnBarcode" msprop:Generator_ColumnPropNameInRow="Barcode" msprop:Generator_ColumnPropNameInTable="BarcodeColumn" msprop:Generator_UserColumnName="Barcode" type="xs:base64Binary" minOccurs="0" />
+              <xs:element name="ItemName" msprop:Generator_ColumnVarNameInTable="columnItemName" msprop:Generator_ColumnPropNameInRow="ItemName" msprop:Generator_ColumnPropNameInTable="ItemNameColumn" msprop:Generator_UserColumnName="ItemName" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
   </xs:element>

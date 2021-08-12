@@ -188,6 +188,7 @@
             this.label6.Size = new System.Drawing.Size(67, 20);
             this.label6.TabIndex = 19;
             this.label6.Text = "Balance";
+            this.label6.Visible = false;
             // 
             // txtbalance
             // 
@@ -198,6 +199,7 @@
             this.txtbalance.Size = new System.Drawing.Size(224, 26);
             this.txtbalance.TabIndex = 4;
             this.txtbalance.Text = "0";
+            this.txtbalance.Visible = false;
             // 
             // label2
             // 
@@ -312,6 +314,7 @@
             this.amounttopay.HeaderText = "Amount to Pay";
             this.amounttopay.MinimumWidth = 8;
             this.amounttopay.Name = "amounttopay";
+            this.amounttopay.Visible = false;
             this.amounttopay.Width = 150;
             // 
             // AmountPaid
@@ -328,6 +331,7 @@
             this.Balance.HeaderText = "Balance";
             this.Balance.MinimumWidth = 8;
             this.Balance.Name = "Balance";
+            this.Balance.Visible = false;
             this.Balance.Width = 200;
             // 
             // CreationDate

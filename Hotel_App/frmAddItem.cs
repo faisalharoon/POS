@@ -120,5 +120,20 @@ namespace General_App
             btnsave.Text = "Save";
             glbItemID = -1;
         }
+
+        private void btnGenerateBarCode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                frmItemBarcode f = new frmItemBarcode();
+                f.Show();
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+
     }
 }

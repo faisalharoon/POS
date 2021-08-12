@@ -143,7 +143,7 @@ sale.SalesTax
                 DataTable dtCustomer = DALAccess.ExecuteDataTable("select * from customer where id=" + dtSale.Rows[0]["CustomerID"]);
 
 
-                ReportParameter[] p = new ReportParameter[20];
+                ReportParameter[] p = new ReportParameter[10];
                 p[0] = new ReportParameter("Date", DateTime.Now.ToString());
 
 

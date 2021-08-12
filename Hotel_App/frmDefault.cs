@@ -156,6 +156,11 @@ namespace General_App
             if (txtItemName.Text == "")
                 return;
 
+            bool isbarcode = false;
+            if (txtItemName.Text.Length >= 8)
+            {
+                isbarcode = true;
+            }
 
             txtItemName.Text = txtItemName.Text.Replace(Environment.NewLine, "");
             txtItemName.Text = txtItemName.Text.Replace("\t", "");
@@ -187,10 +192,9 @@ namespace General_App
                             txtItemName.Text = "";
                         }
                     }
-                }
+                }                           
                 else
                 {
-
                     if (txtItemName.Text != "")
                     {
                         dt = DALAccess.ExecuteDataTable("select * from Item");
@@ -198,8 +202,6 @@ namespace General_App
                         var dt2 = dt.AsEnumerable()
                        .Where(row => Convert.ToString(row.Field<int>("ID")) == txtItemName.Text || row.Field<String>("BarCode") == txtItemName.Text)
                        .OrderByDescending(row => row.Field<int>("ID"));
-
-
 
                         if (dt2 != null && dt2.Count() > 0)
                         {
@@ -213,6 +215,14 @@ namespace General_App
                     else
                         lblName.Text = "";
                 }
+
+
+                if (isbarcode)
+                {
+                    txtQuantity.Text = "1";
+                    txtQuantity_KeyUp(sender,e);
+                }
+
 
                 if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && lblName.Text!="")
                 {
@@ -491,7 +501,7 @@ namespace General_App
                             DataTable dtpurchase = DALAccess.ExecuteDataTable("select purchaseprice from item where id=" + itemid);
                             var purchaseprice = Convert.ToInt32(dtpurchase.Rows[0][0]);
 
-                            str = "insert into saledetail (saleid,itemid,Price,CreationDate,Quantity,total,purchasrprice) values (" + glbSaleID + "," + itemid + "," + price + ",'" + DateTime.Now + "'," + Quantity + "," + total + "," + purchaseprice + ")";
+                            str = "insert into saledetail (saleid,itemid,Price,CreationDate,Quantity,total,purchaseprice) values (" + glbSaleID + "," + itemid + "," + price + ",'" + DateTime.Now + "'," + Quantity + "," + total + "," + purchaseprice + ")";
 
                             //DALAccess.ExecuteNonQuery("update itemstock set stock=stock-" + Quantity + " where itemid=" + itemid);
                             DALAccess.ExecuteNonQuery(str);
@@ -678,7 +688,7 @@ namespace General_App
 
                 try
                 {
-                    //reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
+                    reportViewer2.RenderingComplete += new RenderingCompleteEventHandler(PrintSales);
                 }
                 catch (Exception ex)
                 {
@@ -1408,7 +1418,7 @@ namespace General_App
                 if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
                 {
                     PrintDiscount(e.KeyCode);
-                    this.reportViewer2.LocalReport.Print();
+                    //this.reportViewer2.LocalReport.Print();
                 }
 
 
