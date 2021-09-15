@@ -52,8 +52,8 @@ namespace General_App.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Code\\POS\\POS\\Hotel_App\\bin\\Debug" +
-            "\\Database1.accdb;Persist Security Info=False;")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Code\\POS\\POS - FBR\\Hotel_App\\bin" +
+            "\\Debug\\Database1.accdb;Persist Security Info=False;")]
         public string Constr {
             get {
                 return ((string)(this["Constr"]));
