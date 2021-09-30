@@ -1614,6 +1614,7 @@ namespace General_App
 
 
 
+
                 HttpClient Client = new HttpClient();
                 var content = new StringContent(JsonConvert.SerializeObject(objInv), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = Client.PostAsync("http://localhost:8524/api/IMSFiscal/GetInvoiceNumberByModel", content).Result;
