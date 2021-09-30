@@ -91,7 +91,9 @@ namespace General_App
 
                 glbSaleID = SaleID;
 
-                DataTable dt = DALAccess.ExecuteDataTable(@"select sd.ID,i.Name as ItemName,sd.price,sd.quantity,sd.creationdate,sd.Total,i.ID as ItemID from 
+                DataTable dt = DALAccess.ExecuteDataTable(@"select sd.ID,i.Name as ItemName,sd.price,sd.quantity,sd.creationdate,sd.Total,i.ID as ItemID
+                            ,sd.gstamount as GST
+                            from 
                             (saledetail sd inner join sale s on s.id=sd.saleid)
                             inner join item i on i.id=sd.itemid
                             where sd.saleid=" + SaleID);
@@ -164,7 +166,7 @@ namespace General_App
                 double STPercentage = Convert.ToDouble(XmlExtension.DeSerialize().CustomerSalesTax);
                 double ST = Math.Round((((total- discountAmount) * STPercentage) / 100), 0);
 
-                string query = "update sale set SalesTax="+ST+", customername='" + ddlcustomer.Text + "',ModifiedDate='" + DateTime.Now + "',ModifiedBy=" + LoggedInUser.UserID + ",Discount=" + discountAmount + ",Total=" + total + ",customerid="+ddlcustomer.SelectedValue+" where ID=" + glbSaleID;
+                string query = "update sale set SalesTax="+ST+", customername='" + ddlcustomer.Text + "',ModifiedDate='" + DateTime.Now + "',ModifiedBy=" + LoggedInUser.UserID + ",Discount=" + discountAmount + ",Total=" + total + ",customerid="+ddlcustomer.SelectedValue+",gstamount="+txtgst.Text+" where ID=" + glbSaleID;
                 DALAccess.ExecuteNonQuery(query);
                 BindSale();
             }
@@ -206,6 +208,7 @@ namespace General_App
                     txtItemName.Text = Convert.ToString(dgsaledetail.Rows[e.RowIndex].Cells["ItemName"].Value);
                     txtitemquantity.Text = Convert.ToString(dgsaledetail.Rows[e.RowIndex].Cells["Quantity"].Value);
                     txtitemunitprice.Text = Convert.ToString(dgsaledetail.Rows[e.RowIndex].Cells["Price"].Value);
+                    txtgst.Text = Convert.ToString(dgsaledetail.Rows[e.RowIndex].Cells["GST"].Value);
 
                     glbSaleDetailID = saledetailid;
                     glbItemID = itemID;
@@ -227,18 +230,20 @@ namespace General_App
                     double quantity = Convert.ToDouble(txtitemquantity.Text);
                     double unitprice = Convert.ToDouble(txtitemunitprice.Text);
                     double total = quantity * unitprice;
+                    double gst= Convert.ToDouble(txtgst.Text);
 
-                    DALAccess.ExecuteNonQuery("update saledetail set Price=" + unitprice + ",Quantity=" + quantity + ",Total=" + total + " where ID=" + glbSaleDetailID);
+                    DALAccess.ExecuteNonQuery("update saledetail set gstAmount="+gst+",Price=" + unitprice + ",Quantity=" + quantity + ",Total=" + total + " where ID=" + glbSaleDetailID);
 
 
-                    DataTable dtsale = DALAccess.ExecuteDataTable("select sum(total) from saledetail where saleid=" + glbSaleID);
+                    DataTable dtsale = DALAccess.ExecuteDataTable("select sum(total),sum(gstamount) from saledetail where saleid=" + glbSaleID);
 
                     if (dtsale != null && dtsale.Rows.Count > 0)
                     {
                         double saletotal = Convert.ToDouble(dtsale.Rows[0][0]);
                         double STPercentage = Convert.ToDouble(XmlExtension.DeSerialize().CustomerSalesTax);
-                        double ST=Math.Round(((saletotal* STPercentage)/100),0);
-                        DALAccess.ExecuteNonQuery("update sale set SalesTax="+ST+", total=" + saletotal + ",ModifiedBy=" + LoggedInUser.UserID + ",ModifiedDate='" + DateTime.Now + "' where id=" + glbSaleID);
+                        //double ST=Math.Round(((saletotal* STPercentage)/100),0);
+                        double GST = Convert.ToDouble(dtsale.Rows[0][1]);
+                        DALAccess.ExecuteNonQuery("update sale set NET="+(saletotal+GST)+"-Discount,SalesTax="+GST+",GST="+GST+", total=" + saletotal + ",ModifiedBy=" + LoggedInUser.UserID + ",ModifiedDate='" + DateTime.Now + "' where id=" + glbSaleID);
                     }
 
                     dgsaledetail.DataSource = null;
@@ -251,7 +256,7 @@ namespace General_App
                     double unitprice = Convert.ToDouble(txtitemunitprice.Text);
                     double total = quantity * unitprice;
 
-                    DALAccess.ExecuteNonQuery("insert into saledetail (itemid,saleid,price,quantity,total,creationdate) values ("+glbItemID+","+glbSaleID+","+unitprice+","+quantity+","+total+",'"+DateTime.Now+"') ");
+                    DALAccess.ExecuteNonQuery("insert into saledetail (itemid,saleid,price,quantity,total,creationdate,gstamount,[gst%]) values ("+glbItemID+","+glbSaleID+","+unitprice+","+quantity+","+total+",'"+DateTime.Now+"') ");
 
 
                     DataTable dtsale = DALAccess.ExecuteDataTable("select sum(total) from saledetail where saleid=" + glbSaleID);
@@ -334,6 +339,9 @@ namespace General_App
                 txtItemName.Text = frm.ItemName;
                 glbItemID = Convert.ToInt32(frm.ItemID);
                 txtitemunitprice.Text = frm.SalePrice;
+                txtgst.Text = Math.Round(
+                    ((Convert.ToDouble(frm.SalePrice) * frm.GSTPercentage) / 100)
+                    , 0).ToString();
             }
         }
 

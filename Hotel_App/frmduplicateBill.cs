@@ -54,6 +54,10 @@ sale.SalesTax
 , ItemCategory.DistributorProfitPercentage as [Discount%]
 , i.ItemCategoryID
 ,ItemCategory.Code
+,sd.GSTAmount as GST
+,sd.[GST%]
+,Sale.FBRInvoiceNo
+,sale.Discount
             FROM((saledetail AS sd INNER JOIN item AS i ON sd.itemid = i.id) 
             INNER JOIN sale ON sd.saleid = sale.id) INNER JOIN ItemCategory ON i.ItemCategoryID = ItemCategory.ID 
             where sd.saleid=" + glbSaleID);
@@ -62,12 +66,17 @@ sale.SalesTax
 
 
                 var dtAll = tmpdtinitial.AsEnumerable().Select(x => new {
+                    FBRInvoiceNo=Convert.ToString(x.Field<object>("FBRInvoiceNo")),
                     Name = Convert.ToString(x.Field<object>("Name")),
                     Price = Convert.ToDouble(x.Field<object>("Price")),
                     Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
                     Total = Convert.ToDouble(x.Field<object>("Total")),
-                    Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                });
+                    Discount = Convert.ToDouble(x.Field<object>("Discount")),
+                    //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0),
+                    GST = Convert.ToDouble(x.Field<object>("GST")),
+                    GSTPercentage = Convert.ToDouble(x.Field<object>("GST%")),
+                    GrossTotal = Convert.ToDouble(x.Field<object>("Total"))+ Convert.ToDouble(x.Field<object>("GST"))- Convert.ToDouble(x.Field<object>("Discount"))
+                }).ToList();
 
                 //var dtBrush = tmpdtinitial.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("Code")) =="brush").Select(x => new {
                 //    Name = Convert.ToString(x.Field<object>("Name")),
@@ -120,6 +129,29 @@ sale.SalesTax
 
                     //reportDSDetail = new ReportDataSource("DataSet2", dtBrush);
                     reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
+
+
+
+
+                    Zen.Barcode.CodeQrBarcodeDraw qrcode = Zen.Barcode.BarcodeDrawFactory.CodeQr;
+
+                    pictureBox1.Image = qrcode.Draw(dtAll.FirstOrDefault().FBRInvoiceNo, 50);
+                    ImageConverter converter = new ImageConverter();
+                    byte[] tmp = (byte[])converter.ConvertTo(pictureBox1.Image, typeof(byte[]));
+
+
+                   
+                    DataTable dtbarcode = new DataTable();
+                    dtbarcode.Columns.Add("Barcode", typeof(byte[]));
+                    dtbarcode.Columns.Add("InvoiceNo");
+                    DataRow dr = dtbarcode.NewRow();
+                    dr["Barcode"] = tmp;
+                    dr["InvoiceNo"] = dtAll.FirstOrDefault().FBRInvoiceNo;
+                    dtbarcode.Rows.Add(dr);
+
+                    ReportDataSource reportDSDetail2 = new ReportDataSource("DataSet2", dtbarcode);
+                    reportViewer2.LocalReport.DataSources.Add(reportDSDetail2);
+
                 }
                 catch (Exception ex)
                 {
@@ -132,18 +164,18 @@ sale.SalesTax
 
 
                 double total = tmpdtinitial.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("Total")));
-                int discountPercentage = Convert.ToInt32(dtSale.Rows[0]["DiscountPercentage"]);
+                //int discountPercentage = Convert.ToInt32(dtSale.Rows[0]["DiscountPercentage"]);
                 var discountAmount= Convert.ToDouble(dtSale.Rows[0]["Discount"]);
 
                 double totaldisoucnt = Convert.ToDouble(discountAmount);
                 double gstpercentage = Convert.ToDouble(0);
                 double grosstotal = (total - totaldisoucnt);
-                double gst = Convert.ToDouble(dtSale.Rows[0]["SalesTax"]);
+                double gst = dtAll.Sum(x=>x.GST);
 
                 DataTable dtCustomer = DALAccess.ExecuteDataTable("select * from customer where id=" + dtSale.Rows[0]["CustomerID"]);
 
 
-                ReportParameter[] p = new ReportParameter[10];
+                ReportParameter[] p = new ReportParameter[14];
                 p[0] = new ReportParameter("Date", DateTime.Now.ToString());
 
 
@@ -156,6 +188,12 @@ sale.SalesTax
                 p[7] = new ReportParameter("ShopName", XmlExtension.GetSetupValues().CompanyName);
                 p[8] = new ReportParameter("username", LoggedInUser.DisplayName);
                 p[9] = new ReportParameter("ShopAddress", XmlExtension.GetSetupValues().CompanyAddress);
+
+
+                p[10] = new ReportParameter("NTN", XmlExtension.GetSetupValues().NTN);
+                p[11] = new ReportParameter("STRN", XmlExtension.GetSetupValues().STRN);
+                p[12] = new ReportParameter("InvoiceNo", dtAll.FirstOrDefault().FBRInvoiceNo);
+                p[13] = new ReportParameter("POSID", XmlExtension.GetSetupValues().POSID);
 
 
                 //p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));

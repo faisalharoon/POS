@@ -113,6 +113,12 @@ namespace General_App
                 s.CompanyAddress = txtCompanyAddress.Text;
                 s.CompanyName = txtCompanyName.Text;
 
+                s.NTN = txtNTN.Text;
+                s.STRN= txtSTRN.Text;
+                s.POSID= txtPOSID.Text;
+
+
+
                 DALAccess.RefershConnectionString();
 
                 DALAccess.ExecuteNonQuery("update settings set DataValue='"+s.CustomerSalesTax+"' where datatext='CustomerGST'");
@@ -125,6 +131,11 @@ namespace General_App
 
                 DALAccess.ExecuteNonQuery("update settings set DataValue='" + s.CompanyAddress + "' where datatext='CompanyAddress'");
                 DALAccess.ExecuteNonQuery("update settings set DataValue='" + s.CompanyName + "' where datatext='CompanyName'");
+
+                DALAccess.ExecuteNonQuery("update settings set DataValue='" + s.NTN + "' where datatext='NTN'");
+                DALAccess.ExecuteNonQuery("update settings set DataValue='" + s.STRN+ "' where datatext='STRN'");
+
+                DALAccess.ExecuteNonQuery("update settings set DataValue='" + s.POSID + "' where datatext='POSID'");
             }
             catch (Exception ex)
             {
@@ -157,6 +168,11 @@ namespace General_App
                 txtCompanyName.Text = Convert.ToString(s.CompanyName);
                 txtCompanyAddress.Text = Convert.ToString(s.CompanyAddress);
 
+                txtNTN.Text = Convert.ToString(s.NTN);
+                txtSTRN.Text = Convert.ToString(s.STRN);
+
+                txtPOSID.Text = Convert.ToString(s.POSID);
+
             }
             catch (Exception ex) {
                 
@@ -183,6 +199,10 @@ namespace General_App
 
         public string CompanyName { get; set; }
         public string CompanyAddress { get; set; }
+
+        public string NTN { get; set; }
+        public string STRN { get; set; }
+        public string POSID { get; set; }
     }
 
 
@@ -257,6 +277,12 @@ namespace General_App
 
                 s.CompanyAddress = Convert.ToString(q.Where(x => x.DataText == "CompanyAddress").FirstOrDefault().DataValue);
                 s.CompanyName = Convert.ToString(q.Where(x => x.DataText == "CompanyName").FirstOrDefault().DataValue);
+
+
+                s.NTN = Convert.ToString(q.Where(x => x.DataText == "NTN").FirstOrDefault().DataValue);
+                s.STRN= Convert.ToString(q.Where(x => x.DataText == "STRN").FirstOrDefault().DataValue);
+
+                s.POSID= q.Where(x => x.DataText == "POSID").FirstOrDefault().DataValue;
 
             }
             catch (Exception ex)

@@ -36,6 +36,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnGenerateBarCode = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
             this.txtTotalPacksCatron = new System.Windows.Forms.TextBox();
             this.ddlitemcategory = new System.Windows.Forms.ComboBox();
@@ -46,6 +47,9 @@
             this.btnsave = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.dgmain = new System.Windows.Forms.DataGridView();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textBoxGST = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ItemCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ItemName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -54,9 +58,8 @@
             this.BarCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CreationDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.BulkItems = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GST = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Delete = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.btnGenerateBarCode = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgmain)).BeginInit();
@@ -130,6 +133,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.textBoxGST);
+            this.groupBox1.Controls.Add(this.label8);
             this.groupBox1.Controls.Add(this.btnGenerateBarCode);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.txtTotalPacksCatron);
@@ -153,6 +158,16 @@
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Item Detail";
+            // 
+            // btnGenerateBarCode
+            // 
+            this.btnGenerateBarCode.Location = new System.Drawing.Point(382, 202);
+            this.btnGenerateBarCode.Name = "btnGenerateBarCode";
+            this.btnGenerateBarCode.Size = new System.Drawing.Size(181, 58);
+            this.btnGenerateBarCode.TabIndex = 19;
+            this.btnGenerateBarCode.Text = "Generate Bar Code";
+            this.btnGenerateBarCode.UseVisualStyleBackColor = true;
+            this.btnGenerateBarCode.Click += new System.EventHandler(this.btnGenerateBarCode_Click);
             // 
             // label7
             // 
@@ -239,7 +254,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox2.Size = new System.Drawing.Size(1374, 672);
+            this.groupBox2.Size = new System.Drawing.Size(1567, 672);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Items List";
@@ -256,15 +271,46 @@
             this.BarCode,
             this.CreationDate,
             this.BulkItems,
+            this.GST,
             this.Delete});
             this.dgmain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgmain.Location = new System.Drawing.Point(4, 24);
             this.dgmain.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dgmain.Name = "dgmain";
             this.dgmain.RowHeadersWidth = 62;
-            this.dgmain.Size = new System.Drawing.Size(1366, 643);
+            this.dgmain.Size = new System.Drawing.Size(1559, 643);
             this.dgmain.TabIndex = 0;
             this.dgmain.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgmain_CellDoubleClick);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox3.Location = new System.Drawing.Point(0, 0);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Size = new System.Drawing.Size(1647, 82);
+            this.groupBox3.TabIndex = 1;
+            this.groupBox3.TabStop = false;
+            // 
+            // textBoxGST
+            // 
+            this.textBoxGST.Location = new System.Drawing.Point(540, 154);
+            this.textBoxGST.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxGST.Name = "textBoxGST";
+            this.textBoxGST.Size = new System.Drawing.Size(224, 26);
+            this.textBoxGST.TabIndex = 20;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(416, 159);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(60, 20);
+            this.label8.TabIndex = 21;
+            this.label8.Text = "GST %";
             // 
             // ID
             // 
@@ -296,7 +342,6 @@
             this.PurchasePrice.HeaderText = "PurchasePrice";
             this.PurchasePrice.MinimumWidth = 8;
             this.PurchasePrice.Name = "PurchasePrice";
-            this.PurchasePrice.Width = 150;
             // 
             // SalePrice
             // 
@@ -304,7 +349,6 @@
             this.SalePrice.HeaderText = "SalePrice";
             this.SalePrice.MinimumWidth = 8;
             this.SalePrice.Name = "SalePrice";
-            this.SalePrice.Width = 150;
             // 
             // BarCode
             // 
@@ -330,6 +374,13 @@
             this.BulkItems.Name = "BulkItems";
             this.BulkItems.Width = 150;
             // 
+            // GST
+            // 
+            this.GST.DataPropertyName = "GST";
+            this.GST.HeaderText = "GST";
+            this.GST.MinimumWidth = 8;
+            this.GST.Name = "GST";
+            // 
             // Delete
             // 
             this.Delete.HeaderText = "Delete";
@@ -338,28 +389,6 @@
             this.Delete.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.Delete.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.Delete.Width = 150;
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox3.Location = new System.Drawing.Point(0, 0);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Size = new System.Drawing.Size(1647, 82);
-            this.groupBox3.TabIndex = 1;
-            this.groupBox3.TabStop = false;
-            // 
-            // btnGenerateBarCode
-            // 
-            this.btnGenerateBarCode.Location = new System.Drawing.Point(382, 202);
-            this.btnGenerateBarCode.Name = "btnGenerateBarCode";
-            this.btnGenerateBarCode.Size = new System.Drawing.Size(181, 58);
-            this.btnGenerateBarCode.TabIndex = 19;
-            this.btnGenerateBarCode.Text = "Generate Bar Code";
-            this.btnGenerateBarCode.UseVisualStyleBackColor = true;
-            this.btnGenerateBarCode.Click += new System.EventHandler(this.btnGenerateBarCode_Click);
             // 
             // frmAddItemfrv
             // 
@@ -404,6 +433,9 @@
         private System.Windows.Forms.ComboBox ddlitemcategory;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox txtTotalPacksCatron;
+        private System.Windows.Forms.Button btnGenerateBarCode;
+        private System.Windows.Forms.TextBox textBoxGST;
+        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ItemCategory;
         private System.Windows.Forms.DataGridViewTextBoxColumn ItemName;
@@ -412,7 +444,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn BarCode;
         private System.Windows.Forms.DataGridViewTextBoxColumn CreationDate;
         private System.Windows.Forms.DataGridViewTextBoxColumn BulkItems;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GST;
         private System.Windows.Forms.DataGridViewButtonColumn Delete;
-        private System.Windows.Forms.Button btnGenerateBarCode;
     }
 }

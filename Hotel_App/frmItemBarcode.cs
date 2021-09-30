@@ -67,7 +67,7 @@ namespace General_App
 
                 ImageConverter converter = new ImageConverter();
                  byte [] tmp= (byte[])converter.ConvertTo(pictureBox1.Image, typeof(byte[]));
-                byte[] ItemNamebytes = Encoding.ASCII.GetBytes(ItemName);
+                //byte[] ItemNamebytes = Encoding.ASCII.GetBytes(ItemName);
                 //string strBase64 = Convert.ToBase64String(tmp);
 
 

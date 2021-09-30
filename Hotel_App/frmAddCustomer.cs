@@ -25,7 +25,7 @@ namespace General_App
                 DataTable dtduplicate = DALAccess.ExecuteDataTable("select * from customer where mobile='" + txtmobile.Text + "' and mobile<>'' ");
                 if (dtduplicate == null || dtduplicate.Rows.Count == 0)
                 {
-                    string query = "insert into customer (Name,email,mobile,address,CNIC) values ('" + txtname.Text + "','" + txtemail.Text + "','" + txtmobile.Text + "','" + txtaddress.Text + "','"+txtCNIC.Text+"')";
+                    string query = "insert into customer (Name,email,mobile,address,CNIC,NTN,STRN) values ('" + txtname.Text + "','" + txtemail.Text + "','" + txtmobile.Text + "','" + txtaddress.Text + "','"+txtCNIC.Text+"','"+txtntn.Text+"','"+txtstrn+"')";
                     int ItemID = Convert.ToInt32(DALAccess.ExecuteNonQuery(query));
 
                     MessageBox.Show("Customer Added Successfully");
@@ -35,7 +35,7 @@ namespace General_App
             }
             else // update
             {
-                string query = "update customer set Name='" + txtname.Text + "',email='" + txtemail.Text + "',mobile='" + txtmobile.Text + "',address='" + txtaddress.Text + "',CNIC='"+txtCNIC.Text+"' where ID=" + glbItemID;
+                string query = "update customer set ntn='"+txtntn.Text+"','"+txtstrn.Text+"',Name='" + txtname.Text + "',email='" + txtemail.Text + "',mobile='" + txtmobile.Text + "',address='" + txtaddress.Text + "',CNIC='"+txtCNIC.Text+"' where ID=" + glbItemID;
                 DALAccess.ExecuteNonQuery(query);
                 glbItemID = -1;
                 MessageBox.Show("Customer Updated Successfully");
@@ -46,6 +46,8 @@ namespace General_App
             txtmobile.Text = "";
             txtemail.Text = "";
             txtCNIC.Text = "";
+            txtntn.Text = "";
+            txtstrn.Text = "";
 
             BindGrid();
         }
@@ -87,6 +89,9 @@ namespace General_App
                     txtmobile.Text = Convert.ToString(dgmain.Rows[e.RowIndex].Cells["mobile"].Value);
                     txtaddress.Text = Convert.ToString(dgmain.Rows[e.RowIndex].Cells["Address"].Value);
                     txtCNIC.Text = Convert.ToString(dgmain.Rows[e.RowIndex].Cells["CNIC"].Value);
+
+                    txtntn.Text = Convert.ToString(dgmain.Rows[e.RowIndex].Cells["NTN"].Value);
+                    txtstrn.Text = Convert.ToString(dgmain.Rows[e.RowIndex].Cells["STRN"].Value);
                 }
             }
             catch (Exception)

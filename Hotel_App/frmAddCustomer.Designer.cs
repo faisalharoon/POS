@@ -44,13 +44,19 @@
             this.btnsave = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.dgmain = new System.Windows.Forms.DataGridView();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtstrn = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.txtntn = new System.Windows.Forms.TextBox();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.VendorName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Mobile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Email = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Address = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CNIC = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.NTN = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.STRN = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgmain)).BeginInit();
@@ -124,6 +130,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label7);
+            this.groupBox1.Controls.Add(this.txtstrn);
+            this.groupBox1.Controls.Add(this.label8);
+            this.groupBox1.Controls.Add(this.txtntn);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.txtCNIC);
             this.groupBox1.Controls.Add(this.txtemail);
@@ -210,7 +220,7 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox2.Size = new System.Drawing.Size(1318, 672);
+            this.groupBox2.Size = new System.Drawing.Size(1408, 672);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "List";
@@ -224,14 +234,64 @@
             this.Mobile,
             this.Email,
             this.Address,
-            this.CNIC});
+            this.CNIC,
+            this.NTN,
+            this.STRN});
             this.dgmain.Location = new System.Drawing.Point(4, 25);
             this.dgmain.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dgmain.Name = "dgmain";
             this.dgmain.RowHeadersWidth = 62;
-            this.dgmain.Size = new System.Drawing.Size(1305, 643);
+            this.dgmain.Size = new System.Drawing.Size(1527, 643);
             this.dgmain.TabIndex = 0;
             this.dgmain.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgmain_CellDoubleClick);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox3.Location = new System.Drawing.Point(0, 0);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Size = new System.Drawing.Size(1649, 82);
+            this.groupBox3.TabIndex = 1;
+            this.groupBox3.TabStop = false;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(416, 153);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(52, 20);
+            this.label7.TabIndex = 22;
+            this.label7.Text = "STRN";
+            // 
+            // txtstrn
+            // 
+            this.txtstrn.Location = new System.Drawing.Point(540, 148);
+            this.txtstrn.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtstrn.Name = "txtstrn";
+            this.txtstrn.Size = new System.Drawing.Size(224, 26);
+            this.txtstrn.TabIndex = 21;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(21, 153);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(40, 20);
+            this.label8.TabIndex = 20;
+            this.label8.Text = "NTN";
+            // 
+            // txtntn
+            // 
+            this.txtntn.Location = new System.Drawing.Point(146, 148);
+            this.txtntn.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.txtntn.Name = "txtntn";
+            this.txtntn.Size = new System.Drawing.Size(224, 26);
+            this.txtntn.TabIndex = 19;
             // 
             // ID
             // 
@@ -281,23 +341,27 @@
             this.CNIC.Name = "CNIC";
             this.CNIC.Width = 150;
             // 
-            // groupBox3
+            // NTN
             // 
-            this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.groupBox3.Location = new System.Drawing.Point(0, 0);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox3.Size = new System.Drawing.Size(1354, 82);
-            this.groupBox3.TabIndex = 1;
-            this.groupBox3.TabStop = false;
+            this.NTN.DataPropertyName = "NTN";
+            this.NTN.HeaderText = "NTN";
+            this.NTN.MinimumWidth = 8;
+            this.NTN.Name = "NTN";
+            this.NTN.Width = 150;
+            // 
+            // STRN
+            // 
+            this.STRN.DataPropertyName = "STRN";
+            this.STRN.HeaderText = "STRN";
+            this.STRN.MinimumWidth = 8;
+            this.STRN.Name = "STRN";
+            this.STRN.Width = 150;
             // 
             // frmAddCustomer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1354, 1050);
+            this.ClientSize = new System.Drawing.Size(1649, 1050);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -334,11 +398,17 @@
         private System.Windows.Forms.TextBox txtemail;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtCNIC;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtstrn;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox txtntn;
         private System.Windows.Forms.DataGridViewTextBoxColumn ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn VendorName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Mobile;
         private System.Windows.Forms.DataGridViewTextBoxColumn Email;
         private System.Windows.Forms.DataGridViewTextBoxColumn Address;
         private System.Windows.Forms.DataGridViewTextBoxColumn CNIC;
+        private System.Windows.Forms.DataGridViewTextBoxColumn NTN;
+        private System.Windows.Forms.DataGridViewTextBoxColumn STRN;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Reporting.WinForms;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Data.OleDb;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -32,9 +34,13 @@ namespace General_App
 
         DataTable Maindt;
         bool booljustloaded = false;
-        
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            //GenerateFBRInvoice();
+            //return;
+
+
             this.dataGridView1.Columns["GrossTotal"].ReadOnly = true;
             this.dataGridView1.Columns["Total"].ReadOnly = true;
 
@@ -55,6 +61,7 @@ namespace General_App
                 txtItemName.Focus();
 
                 Maindt = new DataTable();
+                Maindt.Columns.Add("SN");
                 Maindt.Columns.Add("ID");
                 Maindt.Columns.Add("Name");
                 Maindt.Columns.Add("Quantity");
@@ -66,11 +73,13 @@ namespace General_App
                 Maindt.Columns.Add("Code");
                 Maindt.Columns.Add("Discount");
                 Maindt.Columns.Add("GrossTotal");
+                Maindt.Columns.Add("GST");
+                Maindt.Columns.Add("GST%");
 
-                if (!string.IsNullOrEmpty(General_App.Properties.Settings.Default.gst))
-                    txtgst.Text = General_App.Properties.Settings.Default.gst;
-                else
-                    txtgst.Text = "0";
+                //if (!string.IsNullOrEmpty(General_App.Properties.Settings.Default.gst))
+                // txtgst.Text = General_App.Properties.Settings.Default.gst;
+                // else
+                // txtgst.Text = "0";
 
                 //DataTable dt = access2dt();
                 // this.reportViewer2.RefreshReport();
@@ -84,7 +93,7 @@ namespace General_App
 
             fillItemSearch();
 
-           
+
         }
 
         private void fillItemSearch()
@@ -92,20 +101,20 @@ namespace General_App
             try
             {
                 AutoCompleteStringCollection coll = new AutoCompleteStringCollection();
-                DataTable dtCust = DALAccess.ExecuteDataTable("select * from item order by id asc");               
-                    for (int i = 0; i < dtCust.Rows.Count; i++)
-                    {
-                        coll.Add(dtCust.Rows[i]["Name"].ToString());
-                    }
+                DataTable dtCust = DALAccess.ExecuteDataTable("select * from item order by id asc");
+                for (int i = 0; i < dtCust.Rows.Count; i++)
+                {
+                    coll.Add(dtCust.Rows[i]["Name"].ToString());
+                }
 
-                
-               // txtItemName.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+
+                // txtItemName.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                 //txtItemName.AutoCompleteSource = coll;
             }
             catch (Exception)
             {
 
-    
+
             }
         }
 
@@ -153,6 +162,8 @@ namespace General_App
 
         private void txtItemName_KeyUp(object sender, KeyEventArgs e)
         {
+            string ItemID = "";
+
             if (txtItemName.Text == "")
                 return;
 
@@ -175,6 +186,7 @@ namespace General_App
                     if (dtitem != null && dtitem.Rows.Count > 0)
                     {
                         lblName.Text = dtitem.Rows[0]["Name"].ToString();
+                        //ItemID = dtitem.Rows[0]["Name"].ToString();
                     }
                     else
                         lblName.Text = "";
@@ -184,15 +196,16 @@ namespace General_App
 
                         if (dtitem != null && dtitem.Rows.Count > 0)
                         {
-                            txtItemName.Text = dtitem.Rows[0]["ID"].ToString();
-                            txtItemName.SelectionStart = txtItemName.Text.Length;
+                            ItemID = dtitem.Rows[0]["ID"].ToString();
+                            //txtItemName.Text = dtitem.Rows[0]["ID"].ToString();
+                            //txtItemName.SelectionStart = txtItemName.Text.Length;
                         }
                         else
                         {
                             txtItemName.Text = "";
                         }
                     }
-                }                           
+                }
                 else
                 {
                     if (txtItemName.Text != "")
@@ -200,14 +213,15 @@ namespace General_App
                         dt = DALAccess.ExecuteDataTable("select * from Item");
 
                         var dt2 = dt.AsEnumerable()
-                       .Where(row => Convert.ToString(row.Field<int>("ID")) == txtItemName.Text || row.Field<String>("BarCode") == txtItemName.Text)
+                       .Where(row => Convert.ToString(row.Field<int>("ID")) == txtItemName.Text || row.Field<String>("BarCode") == txtItemName.Text || row.Field<String>("Name").ToLower().Contains(txtItemName.Text.ToLower()))
                        .OrderByDescending(row => row.Field<int>("ID"));
 
                         if (dt2 != null && dt2.Count() > 0)
                         {
                             lblName.Text = dt2.First().Field<string>("Name");
-                            txtItemName.Text = Convert.ToString(dt2.First().Field<int>("ID"));
-                            txtItemName.SelectionStart = txtItemName.Text.Length;
+                            ItemID = Convert.ToString(dt2.First().Field<int>("ID"));
+                            //txtItemName.Text = Convert.ToString(dt2.First().Field<int>("ID"));
+                            //txtItemName.SelectionStart = txtItemName.Text.Length;
                         }
                         else
                             lblName.Text = "";
@@ -220,12 +234,15 @@ namespace General_App
                 if (isbarcode)
                 {
                     txtQuantity.Text = "1";
-                    txtQuantity_KeyUp(sender,e);
+                    txtQuantity_KeyUp(sender, e);
                 }
 
 
-                if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && lblName.Text!="")
+                if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) && lblName.Text != "")
                 {
+                    txtItemName.Text = ItemID;
+                    txtItemName.SelectionStart = txtItemName.Text.Length;
+
                     txtQuantity.Text = "1";
                     txtQuantity.Focus();
                     txtQuantity.SelectionStart = txtQuantity.Text.Length;
@@ -249,6 +266,7 @@ namespace General_App
 
         private void txtQuantity_KeyUp(object sender, KeyEventArgs e)
         {
+
             txtQuantity.Text = txtQuantity.Text.Replace(Environment.NewLine, "");
             txtQuantity.Text = txtQuantity.Text.Replace("\t", "");
 
@@ -274,26 +292,26 @@ namespace General_App
                     group by Item.ID,Item.Name             
                             ");
 
-                        if (dtstock != null && dtstock.Rows.Count > 0)
-                        {
-                            int availablestock = Convert.ToInt32(dtstock.Rows[0][0]);
-                            if (quantity > availablestock)
-                            {
-                                MessageBox.Show("You are exceeding Stock limit..");
+                        //if (dtstock != null && dtstock.Rows.Count > 0)
+                        //{
+                        //    int availablestock = Convert.ToInt32(dtstock.Rows[0][0]);
+                        //    if (quantity > availablestock)
+                        //    {
+                        //        MessageBox.Show("You are exceeding Stock limit..");
 
-                                txtQuantity.Text = "0";
-                                txtQuantity.Focus();
+                        //        txtQuantity.Text = "0";
+                        //        txtQuantity.Focus();
 
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            txtItemName.Text = "";
-                            txtItemName.Focus();
-                            MessageBox.Show("Please Enter selected Item Stock.");
-                            return;
-                        }
+                        //        return;
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    txtItemName.Text = "";
+                        //    txtItemName.Focus();
+                        //    MessageBox.Show("Please Enter selected Item Stock.");
+                        //    return;
+                        //}
 
                         if (Convert.ToInt32(txtQuantity.Text) > 0)
                         {
@@ -318,6 +336,12 @@ namespace General_App
                                     Maindt.Rows[innerIndex]["Discount"] = discountAmount.ToString();
                                     Maindt.Rows[innerIndex]["Total"] = total.ToString();
                                     Maindt.Rows[innerIndex]["GrossTotal"] = gross.ToString();
+
+                                    double gstpercentage = Convert.ToDouble(Maindt.Rows[innerIndex]["GST%"]);
+                                    double gst = Math.Round((gross * gstpercentage) / 100, 0);
+                                    Maindt.Rows[innerIndex]["GST"] = gst.ToString();
+                                    Maindt.Rows[innerIndex]["GST%"] = gstpercentage.ToString();
+
                                     dataGridView1.DataSource = Maindt;
                                     UpdateTotal(innerIndex, 0);
                                 }
@@ -346,6 +370,12 @@ namespace General_App
                                         dr["code"] = dtItemCategory.Rows[0]["code"].ToString();
                                         dr["Discount"] = discountAmount;
                                         dr["GrossTotal"] = gross;
+
+                                        double gstpercentage = Convert.ToDouble(Convert.ToString(dt.Rows[0]["GST%"]) == "" ? 0 : dt.Rows[0]["GST%"]);
+                                        double gst = Math.Round((gross * gstpercentage) / 100, 0);
+                                        dr["GST"] = gst.ToString();
+                                        dr["GST%"] = gstpercentage.ToString();
+                                        dr["SN"] = Maindt.Rows.Count + 1;
 
                                         int currentRow = Maindt.Rows.Count;
                                         Maindt.Rows.Add(dr);
@@ -399,6 +429,7 @@ namespace General_App
             Print();
         }
 
+        String FBRInvoiceNo = "";
         private void Print()
         {
             try
@@ -408,7 +439,8 @@ namespace General_App
                 double totalamount = Convert.ToDouble(txttotal.Text);
 
                 //double discountAmount = Math.Round((totalamount * discount) / 100, 0);
-                double discountAmount = Convert.ToDouble(txttotal.Text) - Convert.ToDouble(txtnet.Text);
+                //double discountAmount = Convert.ToDouble(txtnet.Text) - Convert.ToDouble(txttotal.Text);
+                double discountAmount = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<Object>("Discount")));
 
                 double NetAmount = Convert.ToDouble(txtnet.Text);
                 double TaxPercentage = 0;
@@ -422,7 +454,12 @@ namespace General_App
                 TaxAmount = Math.Round(((NetAmount * TaxPercentage) / 100), 0);
 
                 int orderno = 1;
-
+                FBRInvoiceNo= GenerateFBRInvoice();
+                if (string.IsNullOrEmpty(FBRInvoiceNo))
+                {
+                    MessageBox.Show("Unable to generate FBR Invoice No. please try again.");
+                    return;
+                }
 
                 if (glbSaleID == -1)
                 {
@@ -438,7 +475,7 @@ namespace General_App
 
 
 
-                        string str = "insert into Sale (CustomerName,CreationDate,OrderNo,Discount,DiscountPercentage,Total,UserID,CustomerID,SalesTax) values ('" + customername + "','" + DateTime.Now + "'," + orderno + "," + discountAmount + "," + discount + "," + totalamount + "," + LoggedInUser.UserID + "," + ddlcustomer.SelectedValue + "," + TaxAmount + ")";
+                        string str = "insert into Sale (CustomerName,CreationDate,OrderNo,Discount,DiscountPercentage,Total,UserID,CustomerID,SalesTax,gst,FBRInvoiceNo,NET) values ('" + customername + "','" + DateTime.Now + "'," + orderno + "," + discountAmount + "," + discount + "," + totalamount + "," + LoggedInUser.UserID + "," + ddlcustomer.SelectedValue + "," + TaxAmount + "," + txtgst.Text + ",'"+FBRInvoiceNo+"',"+txtnet.Text+")";
                         int saleid = DALAccess.ExecuteNonQuery(str);
 
                         for (int i = 0; i < Maindt.Rows.Count; i++)
@@ -446,12 +483,14 @@ namespace General_App
                             int itemid = Convert.ToInt32(Maindt.Rows[i]["ID"]);
                             double price = Convert.ToDouble(Maindt.Rows[i]["Price"]);
                             int Quantity = Convert.ToInt32(Maindt.Rows[i]["Quantity"]);
+                            double gst = Convert.ToInt32(Maindt.Rows[i]["GST"]);
+                            double gstpercentage = Convert.ToInt32(Maindt.Rows[i]["GST%"]);
                             double total = price * Quantity;
 
                             DataTable dtpurchase = DALAccess.ExecuteDataTable("select purchaseprice from item where id=" + itemid);
                             var purchaseprice = Convert.ToInt32(dtpurchase.Rows[0][0]);
 
-                            str = "insert into saledetail (saleid,itemid,Price,CreationDate,Quantity,total,purchaseprice) values (" + saleid + "," + itemid + "," + price + ",'" + DateTime.Now + "'," + Quantity + "," + total + "," + purchaseprice + ")";
+                            str = "insert into saledetail (saleid,itemid,Price,CreationDate,Quantity,total,purchaseprice,gstAmount,[GST%]) values (" + saleid + "," + itemid + "," + price + ",'" + DateTime.Now + "'," + Quantity + "," + total + "," + purchaseprice + "," + gst + "," + gstpercentage + ")";
 
                             //DALAccess.ExecuteNonQuery("update itemstock set stock=stock-" + Quantity + " where itemid=" + itemid);
 
@@ -523,7 +562,13 @@ namespace General_App
             try
             {
                 double amountpaid = Convert.ToDouble(txtamountpaid.Text == "" ? "0" : txtamountpaid.Text);
-                double balance = totalAmountToPay - amountpaid;
+                double balance = totalAmountToPay-amountpaid;
+
+                if (balance < 0)
+                    balance = 0;
+
+                if (amountpaid > totalAmountToPay)
+                    amountpaid = totalAmountToPay;
 
                 string query = "insert into customerpayment(customerid,amounttopay,amount,balance,createdat,createdby,paiddate) values (" + ddlcustomer.SelectedValue + "," + totalAmountToPay + "," + amountpaid + "," + balance + ",'" + DateTime.Now + "'," + LoggedInUser.UserID + ",'" + DateTime.Now + "')";
                 DALAccess.ExecuteNonQuery(query);
@@ -552,18 +597,19 @@ namespace General_App
                 //double totaldisoucnt = Convert.ToDouble(Math.Round(Convert.ToDecimal((total * discount) / 100), 0));
                 double totaldisoucnt = Convert.ToDouble(txttotal.Text) - Convert.ToDouble(txtnet.Text);
                 double gstpercentage = Convert.ToDouble(XmlExtension.DeSerialize().CustomerSalesTax);
-                double grosstotal = (total - totaldisoucnt);
-                double gst = Math.Round((grosstotal * gstpercentage) / 100, 0);
+                double gst = Convert.ToDouble(txtgst.Text);
+                double grosstotal = (total - totaldisoucnt + gst);
 
-                var dtAll = Maindt.AsEnumerable().Select(x => new
-                {
-                    Name = Convert.ToString(x.Field<object>("Name")),
-                    Price = Convert.ToDouble(x.Field<object>("Price")),
-                    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
-                    Total = Convert.ToDouble(x.Field<object>("Total")),
-                    //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                    Discount = Convert.ToDouble(x.Field<object>("Discount"))
-                });
+
+                //var dtAll = Maindt.AsEnumerable().Select(x => new
+                //{
+                //    Name = Convert.ToString(x.Field<object>("Name")),
+                //    Price = Convert.ToDouble(x.Field<object>("Price")),
+                //    Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
+                //    Total = Convert.ToDouble(x.Field<object>("Total")),
+                //    //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
+                //    Discount = Convert.ToDouble(x.Field<object>("Discount"))
+                //});
 
                 //var dtBrush = Maindt.AsEnumerable().Where(x => Convert.ToString(x.Field<object>("code"))=="brush").Select(x=>new {
                 // Name= Convert.ToString(x.Field<object>("Name")),
@@ -589,12 +635,16 @@ namespace General_App
                     //.Where(x => Convert.ToString(x.Field<object>("code")) == "diaper")
                     .Select(x => new
                     {
+                        SN = Convert.ToString(x.Field<object>("SN")),
                         Name = Convert.ToString(x.Field<object>("Name")),
                         Price = Convert.ToDouble(x.Field<object>("Price")),
                         Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
                         Total = Convert.ToDouble(x.Field<object>("Total")),
                         //Discount = Math.Round((Convert.ToDouble(x.Field<object>("Discount%")) * Convert.ToDouble(x.Field<object>("Total"))) / 100, 0)
-                        Discount = Convert.ToDouble(x.Field<object>("Discount"))
+                        Discount = Convert.ToDouble(x.Field<object>("Discount")),
+                        GST = Convert.ToDouble(x.Field<object>("GST")),
+                        GSTPercentage = Convert.ToDouble(x.Field<object>("GST%")),
+                        GrossTotal = Convert.ToDouble(x.Field<object>("GrossTotal"))
                     }).ToList();
 
                 //dtDiaper.Add(new
@@ -609,10 +659,33 @@ namespace General_App
 
                 try
                 {
+
+
+                    //Zen.Barcode.Code128BarcodeDraw barcode = Zen.Barcode.BarcodeDrawFactory.Code128WithChecksum;
+                    Zen.Barcode.CodeQrBarcodeDraw qrcode = Zen.Barcode.BarcodeDrawFactory.CodeQr;
+
+                    pictureBox2.Image = qrcode.Draw(FBRInvoiceNo, 50);
+                    ImageConverter converter = new ImageConverter();
+                    byte[] tmp = (byte[])converter.ConvertTo(pictureBox2.Image, typeof(byte[]));
+
+
                     ReportDataSource reportDSDetail = new ReportDataSource("DataSet1", dtDiaper);
                     //reportViewer2.LocalReport.ReportPath = "../../Report1-Fullpage.rdlc";
                     reportViewer2.LocalReport.ReportPath = "../../Report1.rdlc";
                     reportViewer2.LocalReport.DataSources.Add(reportDSDetail);
+
+                    DataTable dtbarcode = new DataTable();
+                    dtbarcode.Columns.Add("Barcode", typeof(byte[]));
+                    dtbarcode.Columns.Add("InvoiceNo");
+                    DataRow dr = dtbarcode.NewRow();
+                    dr["Barcode"] = tmp;
+                    dr["InvoiceNo"] = FBRInvoiceNo;
+                    dtbarcode.Rows.Add(dr);
+
+                    ReportDataSource reportDSDetail2 = new ReportDataSource("DataSet2", dtbarcode);
+                    reportViewer2.LocalReport.DataSources.Add(reportDSDetail2);
+
+
                     reportViewer2.LocalReport.EnableExternalImages = true;
 
 
@@ -628,19 +701,30 @@ namespace General_App
                 DataTable dtCustomer = DALAccess.ExecuteDataTable("select * from customer where id=" + ddlcustomer.SelectedValue);
 
 
-                ReportParameter[] p = new ReportParameter[10];
+                ReportParameter[] p = new ReportParameter[14];
                 p[0] = new ReportParameter("Date", DateTime.Now.ToString());
 
 
+                double Discount = dtDiaper.Sum(x => x.Discount);
+
                 p[1] = new ReportParameter("Total", total.ToString());
-                p[2] = new ReportParameter("Discount", dtAll.Sum(x => x.Discount).ToString());
-                p[3] = new ReportParameter("GTotal", dtAll.Sum(x => x.Total).ToString());
+                p[2] = new ReportParameter("Discount", (Discount).ToString());
+                p[3] = new ReportParameter("GTotal", txtnet.Text);
                 p[4] = new ReportParameter("OrderNo", orderno.ToString());
                 p[5] = new ReportParameter("Name", ddlcustomer.Text);
                 p[6] = new ReportParameter("gst", gst.ToString());
                 p[7] = new ReportParameter("ShopName", XmlExtension.GetSetupValues().CompanyName);
                 p[8] = new ReportParameter("username", LoggedInUser.DisplayName);
                 p[9] = new ReportParameter("ShopAddress", XmlExtension.GetSetupValues().CompanyAddress);
+
+                p[10] = new ReportParameter("NTN", XmlExtension.GetSetupValues().NTN);
+                p[11] = new ReportParameter("STRN", XmlExtension.GetSetupValues().STRN);
+                p[12] = new ReportParameter("InvoiceNo", FBRInvoiceNo);
+                p[13] = new ReportParameter("POSID", XmlExtension.GetSetupValues().POSID);
+
+
+
+                //p[13] = new ReportParameter("Barcode", "");
 
 
                 //p[10] = new ReportParameter("CNIC", Convert.ToString(dtCustomer.Rows[0]["CNIC"]));
@@ -660,7 +744,7 @@ namespace General_App
                 //p[19] = new ReportParameter("FinalAmount", (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount)).ToString());
 
 
-                double totalnetAmount = (dtAll.Sum(x => x.Total) - dtAll.Sum(x => x.Discount));
+                double totalnetAmount = (dtDiaper.Sum(x => x.Total) - dtDiaper.Sum(x => x.Discount) + gst);
                 InsertIntoCustomerPayment(totalnetAmount);
 
                 //System.Threading.Thread.Sleep(1000);
@@ -968,6 +1052,16 @@ namespace General_App
             }
         }
 
+
+        private void updateGridSN()
+        {
+
+            for (int i = 1; i <= Maindt.Rows.Count; i++)
+            {
+                Maindt.Rows[i - 1]["SN"] = i;
+            }
+        }
+
         private void UpdateTotal(int rowinde, int colIndex)
         {
             try
@@ -980,8 +1074,8 @@ namespace General_App
                     string DiscountInGrid = Convert.ToString(dataGridView1.Rows[rowinde].Cells["Discount"].Value);
 
 
-                    var singleprice = Convert.ToDouble(Maindt.Rows[rowinde]["Quantity"]);
-                    var singleQuantity = Convert.ToDouble(Maindt.Rows[rowinde]["Price"]);
+                    var singleprice = Convert.ToDouble(Maindt.Rows[rowinde]["Price"]);
+                    var singleQuantity = Convert.ToDouble(Maindt.Rows[rowinde]["Quantity"]);
                     var singleDiscountPercentage = Convert.ToDouble(Maindt.Rows[rowinde]["Discount%"]);
                     var singleTotal = singleprice * singleQuantity;
                     //var singleDiscount = Common.Percentage(singleTotal, singleDiscountPercentage);
@@ -995,9 +1089,19 @@ namespace General_App
 
                     Maindt.Rows[rowinde]["Total"] = singleTotal.ToString();
                     Maindt.Rows[rowinde]["Discount"] = singleDiscount.ToString();
-                    Maindt.Rows[rowinde]["GrossTotal"] = (singleTotal - singleDiscount).ToString();
+
+
+                    double gstpercentage = Convert.ToDouble(Convert.ToString(Maindt.Rows[rowinde]["GST%"]));
+                    double gst = Math.Round(((singleTotal - singleDiscount) * gstpercentage) / 100, 0);
+                    Maindt.Rows[rowinde]["GST"] = gst.ToString();
+
+                    Maindt.Rows[rowinde]["GrossTotal"] = (singleTotal - singleDiscount + gst).ToString();
                     dataGridView1.DataSource = Maindt;
                 }
+
+
+
+                updateGridSN();
 
 
 
@@ -1006,6 +1110,7 @@ namespace General_App
                 {
                     var price = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("Price")) * Convert.ToDouble(x.Field<object>("Quantity")));
                     var discountGridAmount = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("Discount")));
+                    var gst = Maindt.AsEnumerable().Sum(x => Convert.ToDouble(x.Field<object>("gst")));
 
                     var discountPercentage = Convert.ToDouble(txtdiscount.Text);
                     var discountAmount = 0.0;
@@ -1015,12 +1120,13 @@ namespace General_App
                     else
                         discountAmount = discountGridAmount;
 
-                    var NetAmount = price - discountAmount;
+                    var NetAmount = price - discountAmount + gst;
 
                     txttotal.Text = price.ToString();
                     txtnet.Text = NetAmount.ToString();
+                    txtgst.Text = gst.ToString();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
 
@@ -1028,7 +1134,7 @@ namespace General_App
 
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         }
@@ -1440,7 +1546,262 @@ namespace General_App
 
 
 
+        public string GenerateFBRInvoice()
+        {
+            FBRResponse flight = new FBRResponse();
+
+            try
+            {
+                var q = Maindt.AsEnumerable()
+                    .Select(x => new
+                    {
+                        SN = Convert.ToString(x.Field<object>("SN")),
+                        Name = Convert.ToString(x.Field<object>("Name")),
+                        Price = Convert.ToDouble(x.Field<object>("Price")),
+                        Quantity = Convert.ToInt32(x.Field<object>("Quantity")),
+                        Total = Convert.ToInt32(x.Field<object>("Total")),
+                        Discount = Convert.ToInt32(x.Field<object>("Discount")),
+                        GST = Convert.ToInt32(x.Field<object>("GST")),
+                        GSTPercentage = Convert.ToInt32(x.Field<object>("GST%")),
+                        GrossTotal = Convert.ToInt32(x.Field<object>("GrossTotal"))
+                    }).ToList();
+
+
+                Invoice objInv = new Invoice();
+                objInv.InvoiceNumber = string.Empty;
+                objInv.POSID = XmlExtension.GetSetupValues().POSID;
+                objInv.USIN = "BF9B3480";
+                objInv.DateTime = DateTime.Now;
+                objInv.BuyerNTN = "1234567-9";
+                objInv.BuyerCNIC = "12345-1234567-8";
+                objInv.BuyerName =ddlcustomer.Text ;
+                objInv.BuyerPhoneNumber = "0345-1234567";
+                objInv.PaymentMode = 1;
+                objInv.TotalSaleValue = q.Sum(x=>x.Total);
+                objInv.TotalQuantity = q.Sum(x => x.Quantity);
+                objInv.TotalBillAmount = q.Sum(x => x.GrossTotal) ;
+                objInv.TotalTaxCharged = q.Sum(x => x.GST);
+                objInv.Discount = q.Sum(x => x.Discount);
+                objInv.FurtherTax = 0;
+                objInv.InvoiceType = 1;
+
+
+
+
+                List<InvoiceItems> lst = new List<InvoiceItems>();
+
+                foreach (var o in q)
+                {
+                    InvoiceItems objItem = new InvoiceItems();
+                    objItem.ItemCode = "0000";
+                    objItem.ItemName = o.Name;
+                    objItem.Quantity = o.Quantity;
+                    objItem.TotalAmount = Convert.ToDouble(o.GrossTotal);
+                    objItem.SaleValue = Convert.ToDouble(o.Total);
+                    objItem.TaxCharged = Convert.ToDouble(o.GST);
+                    objItem.TaxRate = o.GSTPercentage;
+                    objItem.PCTCode = "11001010";
+                    objItem.FurtherTax = 0;
+                    objItem.InvoiceType = 1;
+                    objItem.Discount = o.Discount;
+
+                    lst.Add(objItem);
+                }
+
+                objInv.Items = lst;
+
+
+
+
+
+                HttpClient Client = new HttpClient();
+                var content = new StringContent(JsonConvert.SerializeObject(objInv), Encoding.UTF8, "application/json");
+                //HttpResponseMessage response = Client.PostAsync("http://localhost:8524/api/IMSFiscal/GetInvoiceNumberByModel", content).Result;
+                HttpResponseMessage response = Client.PostAsync("https://gw.fbr.gov.pk/imsp/v1/api/Live/PostData", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    //Console.WriteLine("Response from API");
+
+                    flight = Newtonsoft.Json.JsonConvert.DeserializeObject<FBRResponse>(response.Content.ReadAsStringAsync().Result);
+                    //Console.WriteLine("———————————————");
+                    //Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                }
+
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return flight.InvoiceNumber;
+        }
+
+
+        public string TestGenerateFBRInvoice()
+        {
+            FBRResponse flight=new FBRResponse();
+
+            try
+            {
+                Invoice objInv = new Invoice();
+                objInv.InvoiceNumber = string.Empty;
+                objInv.POSID = "944172";
+                objInv.USIN = "BF9B3480";
+                objInv.DateTime = DateTime.Now;
+                objInv.BuyerNTN = "1234567-9";
+                objInv.BuyerCNIC = "12345-1234567-8";
+                objInv.BuyerName = "Buyer Name";
+                objInv.BuyerPhoneNumber = "0345-1234567";
+                objInv.PaymentMode = 1;
+                objInv.TotalSaleValue = 0;
+                objInv.TotalQuantity = 0;
+                objInv.TotalBillAmount = 0;
+                objInv.TotalTaxCharged = 0;
+                objInv.Discount = 1000;
+                objInv.FurtherTax = 100;
+                objInv.InvoiceType = 1;
+
+
+
+
+                List<InvoiceItems> lst = new List<InvoiceItems>();
+                InvoiceItems objItem = new InvoiceItems();
+                objItem.ItemCode = "0000";
+                objItem.ItemName = "Item Name";
+                objItem.Quantity = 3;
+                objItem.TotalAmount = Convert.ToDouble(3000.00);
+                objItem.SaleValue = Convert.ToDouble(3180);
+                objItem.TaxCharged = Convert.ToDouble(180);
+                objItem.TaxRate = 6;
+                objItem.PCTCode = "11001010";
+                objItem.FurtherTax = 20;
+                objItem.InvoiceType = 1;
+                objItem.Discount = 500;
+
+                lst.Add(objItem);
+
+                objInv.Items = lst;
+
+
+
+
+
+                HttpClient Client = new HttpClient();
+                var content = new StringContent(JsonConvert.SerializeObject(objInv), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = Client.PostAsync("http://localhost:8524/api/IMSFiscal/GetInvoiceNumberByModel", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Response from API");
+
+                    flight = Newtonsoft.Json.JsonConvert.DeserializeObject<FBRResponse>(response.Content.ReadAsStringAsync().Result);
+                    Console.WriteLine("———————————————");
+                    Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                }
+
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return flight.InvoiceNumber;
+        }
+
+
+
 
 
     }
+
+
+    public class ItemDetails
+    {
+        int ID { get; set; }
+        string Name { get; set; }
+        int Quantity { get; set; }
+        double Price { get; set; }
+        double Total { get; set; }
+        int ItemCategoryID { get; set; }
+        double DiscountPercentage { get; set; }
+        string Code { get; set; }
+        double Discount { get; set; }
+        double GrossTotal { get; set; }
+        double GST { get; set; }
+        double GSTPercentage { get; set; }
+    }
+
+
+
+    public class Invoice
+    {
+
+        public string InvoiceNumber { get; set; }
+
+        public string POSID { get; set; }
+
+        public string USIN { get; set; }
+
+        public DateTime DateTime { get; set; }
+
+        public string BuyerNTN { get; set; }
+
+        public string BuyerCNIC { get; set; }
+
+        public string BuyerName { get; set; }
+
+        public string BuyerPhoneNumber { get; set; }
+
+        public int PaymentMode { get; set; }
+
+        public int TotalSaleValue { get; set; }
+
+        public int TotalQuantity { get; set; }
+
+        public int TotalBillAmount { get; set; }
+
+        public int TotalTaxCharged { get; set; }
+
+        public int Discount { get; set; }
+
+        public int FurtherTax { get; set; }
+
+        public int InvoiceType { get; set; }
+
+        public List<InvoiceItems> Items { get; set; }
+    }
+
+    public class InvoiceItems
+    {
+        public string ItemCode { get; set; }
+
+        public string ItemName { get; set; }
+
+        public int Quantity { get; set; }
+
+        public double TotalAmount { get; set; }
+
+        public double SaleValue { get; set; }
+
+        public double TaxCharged { get; set; }
+
+        public int TaxRate { get; set; }
+
+        public string PCTCode { get; set; }
+
+        public int FurtherTax { get; set; }
+
+        public int InvoiceType { get; set; }
+
+        public int Discount { get; set; }
+    }
+
+
+    public class FBRResponse
+    { 
+    public string InvoiceNumber { get; set; }
+        public string Code { get; set; }
+        public string Response { get; set; }
+        public string Errors { get; set; }
+    }
+
 }

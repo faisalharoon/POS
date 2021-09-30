@@ -15,6 +15,7 @@ namespace General_App
         public string ItemID;
         public string ItemName;
         public string SalePrice;
+        public double GSTPercentage;
 
         public frmItem()
         {
@@ -47,7 +48,7 @@ namespace General_App
 
         private void frmItem_Load(object sender, EventArgs e)
         {
-            DataTable dt = DALAccess.ExecuteDataTable("select * from Item order by id asc");
+            DataTable dt = DALAccess.ExecuteDataTable("select ID,Name,SalePrice,BarCode,[GST%] from Item order by id asc");
             dataGridView1.DataSource = dt;
             textBox1.Select();
         }
@@ -72,6 +73,7 @@ namespace General_App
                     ItemID = Convert.ToString(dataGridView1.Rows[index].Cells[0].Value);
                     ItemName = Convert.ToString(dataGridView1.Rows[index].Cells[1].Value);
                     SalePrice = dataGridView1.Rows[index].Cells[2].Value.ToString();
+                    GSTPercentage= Convert.ToDouble(dataGridView1.Rows[index].Cells[4].Value);
 
                     this.DialogResult = DialogResult.OK;
                     this.Close();

@@ -29,8 +29,8 @@ namespace General_App
             string startdate = Convert.ToDateTime(dtmstart.SelectionStart.Date).ToShortDateString();
             string enddate = Convert.ToDateTime(dtmend.SelectionStart.Date).ToString();
 
-            string query = @"SELECT Saledetail.ItemID,Sale.ID,Item.SalePrice, SaleDetail.PurchasePrice, SaleDetail.Price, SaleDetail.Quantity, SaleDetail.Total, Sale.Discount, Sale.CreationDate
-                            , Item.Name,Item.BulkItems
+            string query = @"SELECT Saledetail.ItemID,Sale.ID,Saledetail.Price as SalePrice, SaleDetail.PurchasePrice, SaleDetail.Price, SaleDetail.Quantity, SaleDetail.Total, Sale.Discount, Sale.CreationDate
+                            , Item.Name,Item.BulkItems,Saledetail.GSTAmount as GST
                             FROM (SaleDetail INNER JOIN Item ON SaleDetail.ItemID = Item.ID) INNER JOIN Sale ON SaleDetail.SaleID = Sale.ID";
             //where Format([Sale.CreationDate],'MM/DD/YYYY')>='" + Convert.ToDateTime(startdate).ToString("MM/dd/yyyy") + @"'
             //and Format([Sale.CreationDate],'MM/DD/YYYY')<='" + Convert.ToDateTime(enddate).ToString("MM/dd/yyyy") + @"'                                 "
@@ -51,7 +51,10 @@ namespace General_App
                 CreationDate = Convert.ToDateTime(x.Field<object>("CreationDate")).Date,
                 CreationDateSale = Convert.ToDateTime(x.Field<object>("CreationDate")).ToString("DD/MM/YYYY"),
                 Name = Convert.ToString(x.Field<object>("Name")),
-                BulkItems = Convert.ToDouble(x.Field<object>("BulkItems"))
+                BulkItems = Convert.ToDouble(x.Field<object>("BulkItems")),
+                GST= Convert.ToDouble(x.Field<object>("GST")),
+                GrossTotal= Convert.ToDouble(x.Field<object>("Total"))+ Convert.ToDouble(x.Field<object>("GST"))- Convert.ToDouble(x.Field<object>("Discount"))
+
             }).Where(x => x.CreationDate.Date >= Convert.ToDateTime(startdate) && x.CreationDate.Date <= Convert.ToDateTime(enddate)).ToList();
 
 
@@ -93,18 +96,20 @@ namespace General_App
 
                 double total = qsale.Sum(x => x.Total);
                 double totalPurchase = qsale.Sum(x => x.PurchasePrice * x.Quantity);
-                double discount = qsale.GroupBy(x => x.ItemID).Sum(x => x.FirstOrDefault().Discount);
+                double discount = qsale.GroupBy(x=>x.ID).Sum(x => x.FirstOrDefault().Discount);
+                double gst = qsale.Sum(x => x.GST);
 
-                ReportParameter[] p = new ReportParameter[9];
+                ReportParameter[] p = new ReportParameter[10];
                 p[0] = new ReportParameter("StartDate", Convert.ToDateTime(startdate).ToString("MMM/dd/yyyy"));
                 p[1] = new ReportParameter("EndDate", Convert.ToDateTime(enddate).ToString("MMM/dd/yyyy"));
                 p[2] = new ReportParameter("Total", (total).ToString());
                 p[3] = new ReportParameter("expense", expenseAmount.ToString());
-                p[4] = new ReportParameter("NET", ((total - totalPurchase) - discount - expenseAmount).ToString());
+                p[4] = new ReportParameter("NET", ((total - totalPurchase) - discount - expenseAmount-gst).ToString());
                 p[5] = new ReportParameter("Discount", (discount).ToString());
                 p[6] = new ReportParameter("other", "0");
                 p[7] = new ReportParameter("expense2", "0");
                 p[8] = new ReportParameter("Purchase", Convert.ToString(totalPurchase));
+                p[9] = new ReportParameter("GST", Convert.ToString(gst));
 
                 reportViewer1.LocalReport.SetParameters(p);
             }
@@ -118,7 +123,8 @@ namespace General_App
                     PurchasePrice = x.Sum(xx => xx.PurchasePrice * xx.Quantity),
                     Quantity = Convert.ToDouble(x.Sum(xx => xx.Quantity)),
                     Discount = x.Sum(xx => xx.Discount),
-                    BulkItems=x.FirstOrDefault().BulkItems
+                    BulkItems=x.FirstOrDefault().BulkItems,
+                    GST= x.Sum(xx => xx.GST),
                 }).ToList();
 
 
@@ -132,7 +138,8 @@ namespace General_App
                         PurchasePrice = x.PurchasePrice,
                         Quantity = Math.Round(Convert.ToDouble(x.Quantity/x.BulkItems),0),
                         Discount = x.Discount,
-                        x.BulkItems
+                        x.BulkItems,
+                        x.GST
                     }).ToList();
                 }
 
@@ -148,19 +155,20 @@ namespace General_App
 
                 double total = qsale.Sum(x => x.Total);
                 double totalPurchase = qsale.Sum(x => x.PurchasePrice * x.Quantity);
-                double discount = qsale.GroupBy(x => x.ID).Sum(x => x.FirstOrDefault().Discount);
+                double discount = qsale.GroupBy(x=>x.ID).Sum(x => x.FirstOrDefault().Discount);
+                double gst= qsale.Sum(x => x.GST);
 
-
-                ReportParameter[] p = new ReportParameter[9];
+                ReportParameter[] p = new ReportParameter[10];
                 p[0] = new ReportParameter("StartDate", Convert.ToDateTime(startdate).ToString("MMM/dd/yyyy"));
                 p[1] = new ReportParameter("EndDate", Convert.ToDateTime(enddate).ToString("MMM/dd/yyyy"));
                 p[2] = new ReportParameter("Total", (total).ToString());
                 p[3] = new ReportParameter("expense", expenseAmount.ToString());
-                p[4] = new ReportParameter("NET", ((total - totalPurchase) - discount - expenseAmount).ToString());
+                p[4] = new ReportParameter("NET", ((total - totalPurchase) - discount - expenseAmount-gst).ToString());
                 p[5] = new ReportParameter("Discount", (discount).ToString());
                 p[6] = new ReportParameter("other", "0");
                 p[7] = new ReportParameter("expense2", "0");
                 p[8] = new ReportParameter("Purchase", totalPurchase.ToString());
+                p[9] = new ReportParameter("GST", gst.ToString());
 
                 reportViewer1.LocalReport.SetParameters(p);
 
