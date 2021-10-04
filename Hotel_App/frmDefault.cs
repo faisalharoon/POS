@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace General_App
@@ -160,8 +161,10 @@ namespace General_App
 
         }
 
-        private void txtItemName_KeyUp(object sender, KeyEventArgs e)
+        private async void txtItemName_KeyUp(object sender, KeyEventArgs e)
         {
+            await Task.Delay(1000);
+            //MessageBox.Show(txtItemName.Text);
             string ItemID = "";
 
             if (txtItemName.Text == "")
