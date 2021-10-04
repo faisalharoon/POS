@@ -208,13 +208,14 @@ namespace General_App
                 }
                 else
                 {
+                    
                     if (txtItemName.Text != "")
                     {
                         dt = DALAccess.ExecuteDataTable("select * from Item");
 
                         var dt2 = dt.AsEnumerable()
                        .Where(row => Convert.ToString(row.Field<int>("ID")) == txtItemName.Text || row.Field<String>("BarCode") == txtItemName.Text || row.Field<String>("Name").ToLower().Contains(txtItemName.Text.ToLower()))
-                       .OrderByDescending(row => row.Field<int>("ID"));
+                       .OrderByDescending(row => row.Field<int>("ID")).ToList();
 
                         if (dt2 != null && dt2.Count() > 0)
                         {
@@ -233,7 +234,9 @@ namespace General_App
 
                 if (isbarcode)
                 {
+                    txtItemName.Text = ItemID;
                     txtQuantity.Text = "1";
+                    autosaveBarcode = 1;
                     txtQuantity_KeyUp(sender, e);
                 }
 
@@ -263,7 +266,7 @@ namespace General_App
 
 
 
-
+        int autosaveBarcode = 0;
         private void txtQuantity_KeyUp(object sender, KeyEventArgs e)
         {
 
@@ -276,8 +279,9 @@ namespace General_App
 
             try
             {
-                if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+                if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab || autosaveBarcode==1)
                 {
+                    
                     if (lblName.Text != "")
                     {
                         txtItemName.Focus();
@@ -413,6 +417,7 @@ namespace General_App
 
                         txtItemName.Focus();
                     }
+                    autosaveBarcode = 0;
                 }
 
 
@@ -454,12 +459,12 @@ namespace General_App
                 TaxAmount = Math.Round(((NetAmount * TaxPercentage) / 100), 0);
 
                 int orderno = 1;
-                FBRInvoiceNo= GenerateFBRInvoice();
-                if (string.IsNullOrEmpty(FBRInvoiceNo))
-                {
-                    MessageBox.Show("Unable to generate FBR Invoice No. please try again.");
-                    return;
-                }
+                //FBRInvoiceNo= GenerateFBRInvoice();
+               // if (string.IsNullOrEmpty(FBRInvoiceNo))
+                //{
+                   // MessageBox.Show("Unable to generate FBR Invoice No. please try again.");
+                   // return;
+                //}
 
                 if (glbSaleID == -1)
                 {
@@ -1708,10 +1713,10 @@ namespace General_App
             return flight.InvoiceNumber;
         }
 
+        private void txtQuantity_ImeModeChanged(object sender, EventArgs e)
+        {
 
-
-
-
+        }
     }
 
 

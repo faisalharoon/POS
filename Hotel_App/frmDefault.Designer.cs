@@ -32,6 +32,16 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDefault));
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Delete = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.SN = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ItemName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Total = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Discount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GST = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GrossTotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnsaveandPrint = new System.Windows.Forms.Button();
             this.lblName = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -86,16 +96,6 @@
             this.txtoldorderNo = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.Delete = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.SN = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ItemName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Quantity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Price = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Total = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Discount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GST = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GrossTotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -151,6 +151,90 @@
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
+            // Delete
+            // 
+            this.Delete.HeaderText = "Delete";
+            this.Delete.MinimumWidth = 8;
+            this.Delete.Name = "Delete";
+            this.Delete.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Delete.Text = "Del";
+            this.Delete.Width = 40;
+            // 
+            // SN
+            // 
+            this.SN.DataPropertyName = "SN";
+            this.SN.HeaderText = "SN";
+            this.SN.MinimumWidth = 8;
+            this.SN.Name = "SN";
+            this.SN.Width = 40;
+            // 
+            // ID
+            // 
+            this.ID.DataPropertyName = "ID";
+            this.ID.HeaderText = "ID";
+            this.ID.MinimumWidth = 8;
+            this.ID.Name = "ID";
+            this.ID.Visible = false;
+            this.ID.Width = 150;
+            // 
+            // ItemName
+            // 
+            this.ItemName.DataPropertyName = "Name";
+            this.ItemName.HeaderText = "Name";
+            this.ItemName.MinimumWidth = 8;
+            this.ItemName.Name = "ItemName";
+            this.ItemName.ReadOnly = true;
+            this.ItemName.Width = 280;
+            // 
+            // Quantity
+            // 
+            this.Quantity.DataPropertyName = "Quantity";
+            this.Quantity.HeaderText = "Qty";
+            this.Quantity.MinimumWidth = 8;
+            this.Quantity.Name = "Quantity";
+            this.Quantity.Width = 40;
+            // 
+            // Price
+            // 
+            this.Price.DataPropertyName = "Price";
+            this.Price.HeaderText = "Price";
+            this.Price.MinimumWidth = 8;
+            this.Price.Name = "Price";
+            this.Price.Width = 60;
+            // 
+            // Total
+            // 
+            this.Total.DataPropertyName = "Total";
+            this.Total.HeaderText = "Total";
+            this.Total.MinimumWidth = 8;
+            this.Total.Name = "Total";
+            this.Total.ReadOnly = true;
+            this.Total.Width = 70;
+            // 
+            // Discount
+            // 
+            this.Discount.DataPropertyName = "Discount";
+            this.Discount.HeaderText = "Discount";
+            this.Discount.MinimumWidth = 8;
+            this.Discount.Name = "Discount";
+            this.Discount.Width = 50;
+            // 
+            // GST
+            // 
+            this.GST.DataPropertyName = "GST";
+            this.GST.HeaderText = "GST";
+            this.GST.MinimumWidth = 8;
+            this.GST.Name = "GST";
+            this.GST.Width = 60;
+            // 
+            // GrossTotal
+            // 
+            this.GrossTotal.DataPropertyName = "GrossTotal";
+            this.GrossTotal.HeaderText = "G.Total";
+            this.GrossTotal.MinimumWidth = 8;
+            this.GrossTotal.Name = "GrossTotal";
+            this.GrossTotal.Width = 80;
+            // 
             // btnsaveandPrint
             // 
             this.btnsaveandPrint.Location = new System.Drawing.Point(528, 447);
@@ -196,6 +280,7 @@
             this.txtQuantity.TabIndex = 11;
             this.txtQuantity.Text = "1";
             this.txtQuantity.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtQuantity_KeyUp);
+            this.txtQuantity.ImeModeChanged += new System.EventHandler(this.txtQuantity_ImeModeChanged);
             // 
             // btnSearch
             // 
@@ -697,90 +782,6 @@
             this.pictureBox2.TabIndex = 15;
             this.pictureBox2.TabStop = false;
             this.pictureBox2.Visible = false;
-            // 
-            // Delete
-            // 
-            this.Delete.HeaderText = "Delete";
-            this.Delete.MinimumWidth = 8;
-            this.Delete.Name = "Delete";
-            this.Delete.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.Delete.Text = "Del";
-            this.Delete.Width = 40;
-            // 
-            // SN
-            // 
-            this.SN.DataPropertyName = "SN";
-            this.SN.HeaderText = "SN";
-            this.SN.MinimumWidth = 8;
-            this.SN.Name = "SN";
-            this.SN.Width = 40;
-            // 
-            // ID
-            // 
-            this.ID.DataPropertyName = "ID";
-            this.ID.HeaderText = "ID";
-            this.ID.MinimumWidth = 8;
-            this.ID.Name = "ID";
-            this.ID.Visible = false;
-            this.ID.Width = 150;
-            // 
-            // ItemName
-            // 
-            this.ItemName.DataPropertyName = "Name";
-            this.ItemName.HeaderText = "Name";
-            this.ItemName.MinimumWidth = 8;
-            this.ItemName.Name = "ItemName";
-            this.ItemName.ReadOnly = true;
-            this.ItemName.Width = 280;
-            // 
-            // Quantity
-            // 
-            this.Quantity.DataPropertyName = "Quantity";
-            this.Quantity.HeaderText = "Qty";
-            this.Quantity.MinimumWidth = 8;
-            this.Quantity.Name = "Quantity";
-            this.Quantity.Width = 40;
-            // 
-            // Price
-            // 
-            this.Price.DataPropertyName = "Price";
-            this.Price.HeaderText = "Price";
-            this.Price.MinimumWidth = 8;
-            this.Price.Name = "Price";
-            this.Price.Width = 60;
-            // 
-            // Total
-            // 
-            this.Total.DataPropertyName = "Total";
-            this.Total.HeaderText = "Total";
-            this.Total.MinimumWidth = 8;
-            this.Total.Name = "Total";
-            this.Total.ReadOnly = true;
-            this.Total.Width = 70;
-            // 
-            // Discount
-            // 
-            this.Discount.DataPropertyName = "Discount";
-            this.Discount.HeaderText = "Discount";
-            this.Discount.MinimumWidth = 8;
-            this.Discount.Name = "Discount";
-            this.Discount.Width = 50;
-            // 
-            // GST
-            // 
-            this.GST.DataPropertyName = "GST";
-            this.GST.HeaderText = "GST";
-            this.GST.MinimumWidth = 8;
-            this.GST.Name = "GST";
-            this.GST.Width = 60;
-            // 
-            // GrossTotal
-            // 
-            this.GrossTotal.DataPropertyName = "GrossTotal";
-            this.GrossTotal.HeaderText = "G.Total";
-            this.GrossTotal.MinimumWidth = 8;
-            this.GrossTotal.Name = "GrossTotal";
-            this.GrossTotal.Width = 80;
             // 
             // frmDefault
             // 
