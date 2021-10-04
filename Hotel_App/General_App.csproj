@@ -498,6 +498,9 @@
     <Content Include="rptDistributorBalance.rdlc" />
     <Content Include="rptStockOpening.rdlc" />
     <Content Include="ReportBarCode.rdlc" />
+    <Content Include="Report1 - Copy.rdlc">
+      <SubType>Designer</SubType>
+    </Content>
     <EmbeddedResource Include="rpttest.rdlc" />
     <Content Include="rptCustomerPayment.rdlc" />
     <None Include="icon-support-login.png" />

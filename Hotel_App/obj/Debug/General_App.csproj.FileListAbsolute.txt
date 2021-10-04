@@ -792,4 +792,3 @@ C:\Code\POS\POS - FBR\Hotel_App\obj\Debug\General_App.exe
 C:\Code\POS\POS - FBR\Hotel_App\obj\Debug\General_App.pdb
 C:\Code\POS\POS - FBR\Hotel_App\bin\Debug\Newtonsoft.Json.dll
 C:\Code\POS\POS - FBR\Hotel_App\bin\Debug\Newtonsoft.Json.xml
-C:\Code\POS\POS - FBR\Hotel_App\obj\Debug\General_App.csprojAssemblyReference.cache
